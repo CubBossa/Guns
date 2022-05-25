@@ -1,6 +1,5 @@
 package de.cubbossa.guns.implementations;
 
-import de.cubbossa.guns.api.MuzzleFlash;
 import de.cubbossa.guns.api.ParticlePlayer;
 import de.cubbossa.guns.api.SoundPlayer;
 import org.bukkit.Location;

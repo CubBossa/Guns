@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public interface Gun {
 
@@ -32,9 +33,15 @@ public interface Gun {
 
 	List<Ammunition> getAmmunition();
 
+	Ammunition getFirstFittingAmmunition();
+
 	int getAmmunitionCharged(Player player);
 
+	void setAmmunitionCharged(Player player, int amount);
+
 	Ammunition getAmmunitionTypeCharged(Player player);
+
+	void setAmmunitionTypeCharged(Player player, Ammunition ammunition);
 
 	int getAmmunitionUncharged(Player player, Ammunition ammunition);
 
@@ -42,11 +49,25 @@ public interface Gun {
 
 	void removeAmmunition(Ammunition ammunition);
 
+	Supplier<EffectPlayer> getMuzzleFlashFactory();
+
+	void setMuzzleFlashFactory(Supplier<EffectPlayer> factory);
+
+	Supplier<Projectile> getProjectileFactory();
+
+	void setProjectileFactory(Supplier<Projectile> factory);
+
+	Supplier<EffectPlayer> getRechargeEffectFactory();
+
+	void getRechargeEffectFactory(Supplier<EffectPlayer> effect);
+
 	Vector getRecoil(Vector direction);
 
-	void perform(Player player);
+	void hit(Player player);
 
 	void recharge(Player player);
 
 	void shoot(Player player);
+
+	ItemStack createWeaponStack();
 }

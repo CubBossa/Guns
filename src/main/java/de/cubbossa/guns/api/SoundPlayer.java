@@ -1,4 +1,6 @@
 package de.cubbossa.guns.api;
 
-public class SoundPlayer {
+public interface SoundPlayer {
+
+    void playSound(float volume);
 }
