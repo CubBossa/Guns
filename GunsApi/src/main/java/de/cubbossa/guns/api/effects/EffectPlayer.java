@@ -23,6 +23,10 @@ public class EffectPlayer {
         effects.remove(effect);
     }
 
+    public EffectPlayer withEffect(EffectPlayer effect) {
+        return withEffect(0, effect);
+    }
+
     public EffectPlayer withEffect(int delay, EffectPlayer effect) {
         effects.put(effect, delay);
         return this;

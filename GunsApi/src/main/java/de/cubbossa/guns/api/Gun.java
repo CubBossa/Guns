@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -36,23 +37,19 @@ public interface Gun {
 
 	void removeAttachment(Attachment attachment);
 
-	List<Ammunition> getAmmunition();
+	List<Ammunition> getValidAmmunition();
 
 	Ammunition getFirstFittingAmmunition();
 
-	int getAmmunitionCharged(ItemStack stack);
+	Map.Entry<Ammunition, Integer> getAmmunitionCharged(ItemStack stack);
 
-	void setAmmunitionCharged(ItemStack stack, int amount);
-
-	Ammunition getAmmunitionTypeCharged(ItemStack stack);
-
-	void setAmmunitionTypeCharged(ItemStack stack, Ammunition ammunition);
+	void setAmmunitionCharged(ItemStack stack, Ammunition ammunition, int amount);
 
 	int getAmmunitionUncharged(Player player, Ammunition ammunition);
 
-	void addAmmunition(Ammunition ammunition);
+	void addValidAmmunition(Ammunition ammunition);
 
-	void removeAmmunition(Ammunition ammunition);
+	void removeValidAmmunition(Ammunition ammunition);
 
 	Supplier<EffectPlayer> getNoAmmunitionEffectFactory();
 

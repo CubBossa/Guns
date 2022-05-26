@@ -14,15 +14,13 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GunsHandler {
@@ -41,6 +39,7 @@ public class GunsHandler {
 	public NamespacedKey gunChargedAmmoType;
 	public NamespacedKey gunChargedAmmoCount;
 	private final Map<NamespacedKey, Gun> gunsRegistry;
+	private final Map<NamespacedKey, Ammunition> ammoRegistry;
 
 	public GunsHandler(JavaPlugin plugin) {
 		instance = this;
@@ -49,6 +48,7 @@ public class GunsHandler {
 		gunChargedAmmoType = new NamespacedKey(plugin, "gunChargedAmmoType");
 		gunChargedAmmoCount = new NamespacedKey(plugin, "gunChargedAmmoCount");
 		gunsRegistry = new HashMap<>();
+		ammoRegistry = new HashMap<>();
 
 		ACTION_SHOOT = createAction(new NamespacedKey(plugin, "simple_shoot"));
 		ACTION_HIT = createAction(new NamespacedKey(plugin, "simple_hit"));
@@ -100,7 +100,7 @@ public class GunsHandler {
 		return gunsRegistry.getOrDefault(key, null);
 	}
 
-	public ItemStack addGunTag(ItemStack itemStack, Gun gun) {
+	public ItemStack setIdentifier(ItemStack itemStack, Gun gun) {
 		ItemMeta meta = itemStack.getItemMeta();
 		if (meta == null) {
 			meta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
@@ -113,17 +113,63 @@ public class GunsHandler {
 		return itemStack;
 	}
 
-	public void addGunTag(Gun gun, ItemStack itemStack, Ammunition type, int amount) {
+	public void setAmmunition(ItemStack itemStack, @Nullable Ammunition type, int amount) {
 		ItemMeta meta = itemStack.getItemMeta();
 		if (meta == null) {
 			meta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
 		}
 		if (meta == null) {
-			throw new RuntimeException("Could not create GunItem for gun '" + gun.getKey() + "', meta is null.");
+			throw new RuntimeException("Could not edit GunItem, meta is null.");
 		}
-		meta.getPersistentDataContainer().set(gunChargedAmmoType, PersistentDataType.STRING, type.getKey().toString());
+		meta.getPersistentDataContainer().set(gunChargedAmmoType, PersistentDataType.STRING, type == null ? "none" : type.getKey().toString());
 		meta.getPersistentDataContainer().set(gunChargedAmmoCount, PersistentDataType.INTEGER, amount);
 		itemStack.setItemMeta(meta);
+	}
+
+	public List<String> getLore(Gun gun) {
+		TagResolver resolver = TagResolver.builder()
+				/*TODO.tag("ammo_amount", Tag.inserting())
+				.tag("ammo_type", Tag.inserting())
+				.tag("attachments", Tag.inserting())*/
+				.build();
+
+		return gun.getLore().stream()
+				.map(s -> GunsHandler.getInstance().deserializeLine(s, resolver))
+				.map(GunsHandler.LEGACY_SERIALIZER::serialize)
+				.toList();
+	}
+
+	public void updateItemStack(ItemStack stack, @Nullable Ammunition type, int amount) {
+		float percent = type == null ? 0 : amount / (float) type.getMagazineCount();
+		ItemMeta meta = stack.getItemMeta();
+		if (meta == null) {
+			meta = Bukkit.getItemFactory().getItemMeta(stack.getType());
+		}
+		if (meta == null) {
+			throw new RuntimeException("Could not edit GunItem, meta is null.");
+		}
+		if (meta instanceof Damageable damageable) {
+			damageable.setDamage((int) ((1 - percent) * stack.getType().getMaxDurability()));
+		}
+		meta.setLore(getLore(getGun(stack)));
+		stack.setItemMeta(meta);
+	}
+
+	public @Nullable Map.Entry<Ammunition, Integer> getAmmunition(ItemStack stack) {
+		ItemMeta meta = stack.getItemMeta();
+		if (meta == null) {
+			return null;
+		}
+		String key = meta.getPersistentDataContainer().get(gunChargedAmmoType, PersistentDataType.STRING);
+		Integer amount = meta.getPersistentDataContainer().get(gunChargedAmmoCount, PersistentDataType.INTEGER);
+		if (key == null || amount == null || key.equals("none")) {
+			return null;
+		}
+		Ammunition ammunition = getAmmunition(NamespacedKey.fromString(key));
+		if (ammunition == null) {
+			return null;
+		}
+		return new AbstractMap.SimpleEntry<>(ammunition, amount);
 	}
 
 	public <C extends GunActionContext> void perform(GunAction<C> action, C context) throws Throwable {
@@ -151,4 +197,17 @@ public class GunsHandler {
 		MiniMessage mm = MiniMessage.miniMessage();
 		return Arrays.stream(text.split("\n")).map(s -> mm.deserialize(s, resolver)).collect(Collectors.toList());
 	}
+
+	public @Nullable Ammunition getAmmunition(NamespacedKey key) {
+		return ammoRegistry.getOrDefault(key, null);
+	}
+
+	public void registerAmmunition(Ammunition ammunition) {
+		if (gunsRegistry.containsKey(ammunition.getKey())) {
+			throw new IllegalArgumentException("An ammo with key '" + ammunition.getKey().toString() + "' already exists.");
+		}
+		this.ammoRegistry.put(ammunition.getKey(), ammunition);
+	}
+
+
 }
