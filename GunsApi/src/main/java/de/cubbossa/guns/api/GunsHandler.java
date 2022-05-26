@@ -5,6 +5,10 @@ import de.cubbossa.guns.api.context.HitContext;
 import de.cubbossa.guns.api.context.RechargeContext;
 import de.cubbossa.guns.api.context.ShootContext;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -15,12 +19,15 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GunsHandler {
 
+	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 	public static GunAction<ShootContext> ACTION_SHOOT;
 	public static GunAction<HitContext> ACTION_HIT;
 	public static GunAction<RechargeContext> ACTION_RECHARGE;
@@ -31,12 +38,16 @@ public class GunsHandler {
 	@Getter
 	private JavaPlugin plugin;
 	public NamespacedKey gunMetaKey;
+	public NamespacedKey gunChargedAmmoType;
+	public NamespacedKey gunChargedAmmoCount;
 	private final Map<NamespacedKey, Gun> gunsRegistry;
 
 	public GunsHandler(JavaPlugin plugin) {
 		instance = this;
 		this.plugin = plugin;
 		gunMetaKey = new NamespacedKey(plugin, "gunType");
+		gunChargedAmmoType = new NamespacedKey(plugin, "gunChargedAmmoType");
+		gunChargedAmmoCount = new NamespacedKey(plugin, "gunChargedAmmoCount");
 		gunsRegistry = new HashMap<>();
 
 		ACTION_SHOOT = createAction(new NamespacedKey(plugin, "simple_shoot"));
@@ -102,20 +113,42 @@ public class GunsHandler {
 		return itemStack;
 	}
 
+	public void addGunTag(Gun gun, ItemStack itemStack, Ammunition type, int amount) {
+		ItemMeta meta = itemStack.getItemMeta();
+		if (meta == null) {
+			meta = Bukkit.getItemFactory().getItemMeta(itemStack.getType());
+		}
+		if (meta == null) {
+			throw new RuntimeException("Could not create GunItem for gun '" + gun.getKey() + "', meta is null.");
+		}
+		meta.getPersistentDataContainer().set(gunChargedAmmoType, PersistentDataType.STRING, type.getKey().toString());
+		meta.getPersistentDataContainer().set(gunChargedAmmoCount, PersistentDataType.INTEGER, amount);
+		itemStack.setItemMeta(meta);
+	}
+
 	public <C extends GunActionContext> void perform(GunAction<C> action, C context) throws Throwable {
 		Gun gun = getGun(context.getStack());
 		// Item is not a gun
-		if(gun == null) {
+		if (gun == null) {
 			return;
 		}
 
 		Player player = context.getPlayer();
 		// Player not allowed to use gun
-		if(!gun.getUsePredicate().test(player)) {
+		if (!gun.getUsePredicate().test(player)) {
 			return;
 		}
 
 		// Let gun handle
 		gun.perform(action, context);
+	}
+
+	public Component deserializeLine(String text, TagResolver... resolver) {
+		return MiniMessage.miniMessage().deserialize(text, resolver);
+	}
+
+	public List<Component> deserializeLines(String text, TagResolver... resolver) {
+		MiniMessage mm = MiniMessage.miniMessage();
+		return Arrays.stream(text.split("\n")).map(s -> mm.deserialize(s, resolver)).collect(Collectors.toList());
 	}
 }

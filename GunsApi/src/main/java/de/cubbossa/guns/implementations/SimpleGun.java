@@ -3,15 +3,19 @@ package de.cubbossa.guns.implementations;
 import de.cubbossa.guns.api.*;
 import de.cubbossa.guns.api.attachments.Attachment;
 import de.cubbossa.guns.api.context.*;
+import de.cubbossa.guns.api.effects.EffectPlayer;
+import de.cubbossa.guns.api.effects.SoundPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
@@ -29,15 +33,15 @@ public class SimpleGun implements Gun {
 
 	private final NamespacedKey key;
 	private ItemStack itemStack = new ItemStack(Material.STONE_HOE);
-	private ComponentLike name = Component.empty();
-	private List<ComponentLike> lore = new ArrayList<>();
+	private String name = "Just a Gun";
+	private List<String> lore = new ArrayList<>();
 	private Predicate<Player> usePredicate = p -> true;
 
 	private List<Attachment> attachments = new ArrayList<>();
 	private List<Ammunition> ammunition = new ArrayList<>();
-	private Supplier<GunProjectile> projectileFactory = SimpleProjectile::new;
 	private Supplier<EffectPlayer> muzzleFlashFactory = () -> new SoundPlayer().withSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF);
 	private Supplier<EffectPlayer> rechargeEffectFactory = EffectPlayer::new;
+	private Supplier<EffectPlayer> noAmmunitionEffectFactory = EffectPlayer::new;
 	private Map<GunAction<?>, ContextConsumer<?>> actionMap = new HashMap<>();
 
 	public SimpleGun(NamespacedKey key) {
@@ -62,19 +66,19 @@ public class SimpleGun implements Gun {
 		return null;
 	}
 
-	public int getAmmunitionCharged(Player player) {
+	public int getAmmunitionCharged(ItemStack stack) {
 		return 0;
 	}
 
-	public void setAmmunitionCharged(Player player, int amount) {
+	public void setAmmunitionCharged(ItemStack stack, int amount) {
 
 	}
 
-	public Ammunition getAmmunitionTypeCharged(Player player) {
+	public Ammunition getAmmunitionTypeCharged(ItemStack stack) {
 		return null;
 	}
 
-	public void setAmmunitionTypeCharged(Player player, Ammunition ammunition) {
+	public void setAmmunitionTypeCharged(ItemStack stack, Ammunition ammunition) {
 
 	}
 
@@ -132,9 +136,19 @@ public class SimpleGun implements Gun {
 
 	public void shoot(ShootContext context) {
 
+		context.getCancellable().setCancelled(true);
+
+		Ammunition ammunition = getAmmunitionTypeCharged(context.getStack());
+		// No ammunition charged
+		if (ammunition == null) {
+			noAmmunitionEffectFactory.get().play(context.getPlayer().getEyeLocation());
+			return;
+		}
+
+		// Prepare shot
 		EffectPlayer flash = getMuzzleFlashFactory().get();
-		GunProjectile projectile = getProjectileFactory().get();
-		projectile.setVelocity(context.getPlayer().getLocation().getDirection().multiply(5));
+		GunProjectile projectile = ammunition.getProjectile();
+		projectile.setVelocity(context.getPlayer().getLocation().getDirection().normalize().multiply(10));
 
 		context.setMuzzleFlash(flash);
 		context.setProjectile(projectile);
@@ -150,35 +164,50 @@ public class SimpleGun implements Gun {
 			}
 		}
 		if (context.isCancelled()) {
-			context.getCancellable().setCancelled(true);
+			noAmmunitionEffectFactory.get().play(context.getPlayer().getEyeLocation());
 			return;
 		}
 
 		Player player = context.getPlayer();
 
-		if (!ammunition.isEmpty()) {
-			Ammunition ammo = getAmmunitionTypeCharged(player);
-			// Weapon not charged
-			if (ammo == null) {
-				return;
-			}
-			// Not enough ammo charged
-			if (ammo.removeCount(player, context.getAmmunitionCosts())) {
-				return;
-			}
+		// Not enough ammunition charged
+		if (ammunition.removeCount(player, context.getAmmunitionCosts())) {
+			return;
 		}
-		context.getCancellable().setCancelled(true);
 
-		flash.play(player.getLocation());
+		// Apply shot
+		player.setVelocity(player.getVelocity().add(context.getRecoil()));
+		flash.play(player.getEyeLocation());
 		projectile.create(player);
+	}
+
+	public void updateWeaponStack(ItemStack stack) {
+
 	}
 
 	public ItemStack createWeaponStack() {
 		ItemStack stack = itemStack.clone();
 		ItemMeta meta = stack.getItemMeta();
-		//meta.setDisplayName(x);
-		//meta.setLore(x);
+
+		if(meta instanceof Damageable damageable) {
+			damageable.setDamage(stack.getType().getMaxDurability() - 1);
+		}
+
+		Component name = GunsHandler.getInstance().deserializeLine(getName());
+
+		TagResolver resolver = TagResolver.builder()
+				.tag("name", Tag.inserting(name))
+				/*TODO.tag("ammo_amount", Tag.inserting())
+				.tag("ammo_type", Tag.inserting())
+				.tag("attachments", Tag.inserting())*/
+				.build();
+		meta.setDisplayName(GunsHandler.LEGACY_SERIALIZER.serialize(name));
+		meta.setLore(getLore().stream()
+				.map(s -> GunsHandler.getInstance().deserializeLine(s, resolver))
+				.map(GunsHandler.LEGACY_SERIALIZER::serialize)
+				.toList());
 		stack.setItemMeta(meta);
+
 		return GunsHandler.getInstance().addGunTag(stack, this);
 	}
 }

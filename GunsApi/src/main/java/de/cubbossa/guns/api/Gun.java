@@ -3,6 +3,7 @@ package de.cubbossa.guns.api;
 import de.cubbossa.guns.api.attachments.Attachment;
 import de.cubbossa.guns.api.context.ContextConsumer;
 import de.cubbossa.guns.api.context.GunActionContext;
+import de.cubbossa.guns.api.effects.EffectPlayer;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -21,13 +22,13 @@ public interface Gun {
 
 	void setItemStack(ItemStack stack);
 
-	ComponentLike getName();
+	String getName();
 
-	void setName(ComponentLike name);
+	void setName(String name);
 
-	List<ComponentLike> getLore();
+	List<String> getLore();
 
-	void setLore(List<ComponentLike> lore);
+	void setLore(List<String> lore);
 
 	List<Attachment> getAttachments();
 
@@ -39,13 +40,13 @@ public interface Gun {
 
 	Ammunition getFirstFittingAmmunition();
 
-	int getAmmunitionCharged(Player player);
+	int getAmmunitionCharged(ItemStack stack);
 
-	void setAmmunitionCharged(Player player, int amount);
+	void setAmmunitionCharged(ItemStack stack, int amount);
 
-	Ammunition getAmmunitionTypeCharged(Player player);
+	Ammunition getAmmunitionTypeCharged(ItemStack stack);
 
-	void setAmmunitionTypeCharged(Player player, Ammunition ammunition);
+	void setAmmunitionTypeCharged(ItemStack stack, Ammunition ammunition);
 
 	int getAmmunitionUncharged(Player player, Ammunition ammunition);
 
@@ -53,13 +54,13 @@ public interface Gun {
 
 	void removeAmmunition(Ammunition ammunition);
 
+	Supplier<EffectPlayer> getNoAmmunitionEffectFactory();
+
+	void setNoAmmunitionEffectFactory(Supplier<EffectPlayer> player);
+
 	Supplier<EffectPlayer> getMuzzleFlashFactory();
 
 	void setMuzzleFlashFactory(Supplier<EffectPlayer> factory);
-
-	Supplier<GunProjectile> getProjectileFactory();
-
-	void setProjectileFactory(Supplier<GunProjectile> factory);
 
 	Supplier<EffectPlayer> getRechargeEffectFactory();
 

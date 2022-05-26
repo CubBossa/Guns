@@ -1,9 +1,11 @@
-package de.cubbossa.guns.api;
+package de.cubbossa.guns.api.effects;
 
+import de.cubbossa.guns.api.GunsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EffectPlayer {
 
@@ -28,7 +30,11 @@ public class EffectPlayer {
 
     public void play(Location location) {
         for (Map.Entry<EffectPlayer, Integer> entry : effects.entrySet()) {
-            Bukkit.getScheduler().runTaskLater(GunsHandler.getInstance().getPlugin(), () -> entry.getKey().play(location), entry.getValue());
+            if (entry.getValue() > 0) {
+                Bukkit.getScheduler().runTaskLater(GunsHandler.getInstance().getPlugin(), () -> entry.getKey().play(location), entry.getValue());
+            } else {
+                entry.getKey().play(location);
+            }
         }
     }
 }

@@ -1,6 +1,8 @@
-package de.cubbossa.guns.api;
+package de.cubbossa.guns.api.effects;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -8,6 +10,8 @@ import org.bukkit.entity.Player;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SoundPlayer extends EffectPlayer {
 
     private Sound sound = Sound.ENTITY_EGG_THROW;

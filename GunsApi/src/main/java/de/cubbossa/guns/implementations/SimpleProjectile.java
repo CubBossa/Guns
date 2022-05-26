@@ -14,14 +14,14 @@ import org.bukkit.util.Vector;
 @Setter
 public class SimpleProjectile implements GunProjectile {
 
-	private Vector velocity = new Vector(0, 1, 0);
+	private Vector velocity = new Vector(0, 6, 0);
 	private ItemStack displayItem = new ItemStack(Material.POLISHED_BLACKSTONE_BUTTON);
 	private float accuracy = 0;
 	private Particle particleType;
 	private int particlePeriod;
 
 	public void create(Player player) {
-		Snowball projectile = player.launchProjectile(Snowball.class);
+		Snowball projectile = player.launchProjectile(Snowball.class, velocity);
 		projectile.setItem(displayItem != null ? displayItem.clone() : new ItemStack(Material.AIR));
 	}
 }

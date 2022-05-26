@@ -1,6 +1,6 @@
 package de.cubbossa.guns.api.context;
 
-import de.cubbossa.guns.api.EffectPlayer;
+import de.cubbossa.guns.api.effects.EffectPlayer;
 import de.cubbossa.guns.api.GunProjectile;
 import lombok.Getter;
 import lombok.Setter;
