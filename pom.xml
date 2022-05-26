@@ -6,7 +6,13 @@
 
     <groupId>de.cubbossa</groupId>
     <artifactId>Guns</artifactId>
+    <packaging>pom</packaging>
     <version>0.1</version>
+    
+    <modules>
+        <module>GunsApi</module>
+        <module>GunsApi-Plugin</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -88,17 +94,37 @@
             <version>4.10.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.github.CubBossa.MenuFramework</groupId>
-            <artifactId>MenuFramework</artifactId>
-            <version>v1.1.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>de.cubbossa</groupId>
-            <artifactId>translations_framework</artifactId>
-            <version>0.1</version>
-        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <finalName>${project.artifactId}-${project.version}</finalName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,10 +1,12 @@
 package de.cubbossa.guns.api;
 
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-public interface Projectile {
+public interface GunProjectile {
 
 	Vector getVelocity();
 
@@ -18,13 +20,13 @@ public interface Projectile {
 
 	void setAccuracy(float accuracy);
 
-	int getParticleType();
+	Particle getParticleType();
 
-	void setParticleType();
+	void setParticleType(Particle particleType);
 
 	int getParticlePeriod();
 
-	void setParticlePeriod();
+	void setParticlePeriod(int period);
 
-	void create(Location location);
+	void create(Player player);
 }

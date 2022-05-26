@@ -1,0 +1,9 @@
+name: GunsAPI
+main: de.cubbossa.guns.plugin.GunsAPI
+author: CubBossa, KommissarJunior
+description: Adds methods as API and default guns to the game.
+version: ${project.version}
+api-version: 1.14
+
+commands:
+  gunsapi:

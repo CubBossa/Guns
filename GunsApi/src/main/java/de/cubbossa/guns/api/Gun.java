@@ -1,5 +1,8 @@
 package de.cubbossa.guns.api;
 
+import de.cubbossa.guns.api.attachments.Attachment;
+import de.cubbossa.guns.api.context.ContextConsumer;
+import de.cubbossa.guns.api.context.GunActionContext;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -7,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public interface Gun {
@@ -53,21 +57,23 @@ public interface Gun {
 
 	void setMuzzleFlashFactory(Supplier<EffectPlayer> factory);
 
-	Supplier<Projectile> getProjectileFactory();
+	Supplier<GunProjectile> getProjectileFactory();
 
-	void setProjectileFactory(Supplier<Projectile> factory);
+	void setProjectileFactory(Supplier<GunProjectile> factory);
 
 	Supplier<EffectPlayer> getRechargeEffectFactory();
 
-	void getRechargeEffectFactory(Supplier<EffectPlayer> effect);
+	void setRechargeEffectFactory(Supplier<EffectPlayer> effect);
 
 	Vector getRecoil(Vector direction);
 
-	void hit(Player player);
+	Predicate<Player> getUsePredicate();
 
-	void recharge(Player player);
+	void setUsePredicate(Predicate<Player> usePredicate);
 
-	void shoot(Player player);
+	<C extends GunActionContext> void addActionHandler(GunAction<C> action, ContextConsumer<C> handler);
+
+	<C extends GunActionContext> void perform(GunAction<C> action, C context) throws Throwable;
 
 	ItemStack createWeaponStack();
 }

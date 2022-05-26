@@ -28,7 +28,7 @@ public class EffectPlayer {
 
     public void play(Location location) {
         for (Map.Entry<EffectPlayer, Integer> entry : effects.entrySet()) {
-            Bukkit.getScheduler().runTaskLater(PLUGIN, () -> entry.getKey().play(location), entry.getValue());
+            Bukkit.getScheduler().runTaskLater(GunsHandler.getInstance().getPlugin(), () -> entry.getKey().play(location), entry.getValue());
         }
     }
 }
