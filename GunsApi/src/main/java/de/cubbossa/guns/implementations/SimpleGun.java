@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,7 +36,7 @@ public class SimpleGun implements Gun {
 	private List<Attachment> attachments = new ArrayList<>();
 	private List<Ammunition> ammunition = new ArrayList<>();
 	private Supplier<GunProjectile> projectileFactory = SimpleProjectile::new;
-	private Supplier<EffectPlayer> muzzleFlashFactory = EffectPlayer::new;
+	private Supplier<EffectPlayer> muzzleFlashFactory = () -> new SoundPlayer().withSound(Sound.BLOCK_STONE_BUTTON_CLICK_OFF);
 	private Supplier<EffectPlayer> rechargeEffectFactory = EffectPlayer::new;
 	private Map<GunAction<?>, ContextConsumer<?>> actionMap = new HashMap<>();
 

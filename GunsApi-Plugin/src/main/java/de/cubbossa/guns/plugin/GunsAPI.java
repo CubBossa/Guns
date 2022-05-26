@@ -20,9 +20,6 @@ public class GunsAPI extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new GunListener(), this);
 
 		SimpleGun gun = new SimpleGun(new NamespacedKey(this, "test-gun"));
-		gun.setItemStack(new ItemStack(Material.LEVER));
-		gun.setProjectileFactory(SimpleProjectile::new);
-		gun.setMuzzleFlashFactory(EffectPlayer::new);
 
 		getCommand("gunsapi").setExecutor((sender, cmd, label, args) -> {
 			((Player) sender).getInventory().addItem(gun.createWeaponStack());

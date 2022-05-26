@@ -2,7 +2,6 @@ package de.cubbossa.guns.api;
 
 import org.bukkit.Location;
 
-public interface ParticlePlayer {
+public class ParticlePlayer extends EffectPlayer {
 
-     void playParticle(Location location);
 }
