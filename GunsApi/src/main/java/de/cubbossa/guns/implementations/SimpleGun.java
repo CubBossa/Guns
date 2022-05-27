@@ -60,7 +60,7 @@ public class SimpleGun implements Gun {
 	}
 
 	public Ammunition getFirstFittingAmmunition() {
-		return null;
+		return getValidAmmunition().get(0);
 	}
 
 	public Map.Entry<Ammunition, Integer> getAmmunitionCharged(ItemStack stack) {
@@ -109,6 +109,7 @@ public class SimpleGun implements Gun {
 		EffectPlayer effectPlayer = getRechargeEffectFactory().get();
 		context.setAmmunition(getFirstFittingAmmunition());
 
+		context.getCancellable().setCancelled(true);
 		for (Attachment attachment : attachments) {
 			try {
 				attachment.perform(GunsHandler.ACTION_RECHARGE, context);
@@ -116,10 +117,12 @@ public class SimpleGun implements Gun {
 				GunsHandler.getInstance().getPlugin().getLogger().log(Level.SEVERE, "Could not perform guns attachment action for gun '" + key.toString() + "'.", t);
 			}
 		}
-		if (context.getCancellable().isCancelled()) {
+		if (context.isCancelled()) {
 			return;
 		}
-		context.getAmmunition().recharge(this, context.getPlayer());
+
+		GunsHandler.getInstance().setAmmunition(context.getStack(), context.getAmmunition(), context.getAmmunition().getMagazineCount());
+		GunsHandler.getInstance().updateItemStack(context.getStack(), this, context.getAmmunition(), context.getAmmunition().getMagazineCount());
 		effectPlayer.play(context.getPlayer().getLocation());
 	}
 
@@ -161,10 +164,13 @@ public class SimpleGun implements Gun {
 		Player player = context.getPlayer();
 
 		// Not enough ammunition charged
-		if (!ammunition.removeCount(player, context.getAmmunitionCosts())) {
+		if (pair.getValue() < context.getAmmunitionCosts()) {
 			noAmmunitionEffectFactory.get().play(context.getPlayer().getEyeLocation());
 			return;
 		}
+		GunsHandler.getInstance().setAmmunition(context.getStack(), ammunition, pair.getValue() - context.getAmmunitionCosts());
+		GunsHandler.getInstance().updateItemStack(context.getStack(), this, ammunition, pair.getValue() - context.getAmmunitionCosts());
+		player.getInventory().setItemInMainHand(context.getStack());
 
 		// Apply shot
 		player.setVelocity(player.getVelocity().add(context.getRecoil()));
@@ -177,7 +183,7 @@ public class SimpleGun implements Gun {
 		if (pair == null) {
 			return;
 		}
-		GunsHandler.getInstance().updateItemStack(stack, pair.getKey(), pair.getValue());
+		GunsHandler.getInstance().updateItemStack(stack, this, pair.getKey(), pair.getValue());
 	}
 
 	public ItemStack createWeaponStack() {

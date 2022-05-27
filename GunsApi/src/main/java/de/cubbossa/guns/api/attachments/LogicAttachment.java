@@ -1,4 +1,4 @@
 package de.cubbossa.guns.api.attachments;
 
-public class LogicAttachment {
+public abstract class LogicAttachment implements Attachment {
 }

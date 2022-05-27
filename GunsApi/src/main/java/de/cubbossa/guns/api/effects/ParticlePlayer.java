@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
@@ -18,6 +19,7 @@ public class ParticlePlayer extends EffectPlayer {
 	private int amount;
 	private Vector offset = new Vector(0, 0, 0);
 	private Vector motion = new Vector(0, 0, 0);
+	private Object data = null;
 
 	public ParticlePlayer(Particle particle, int amount, Vector offset) {
 		this.particle = particle;
@@ -28,7 +30,7 @@ public class ParticlePlayer extends EffectPlayer {
 	@Override public void play(Location location) {
 		location = location.clone().subtract(0, .3f, 0);
 		Vector motion = this.motion.clone().multiply(location.getDirection());
-		location.getWorld().spawnParticle(particle, location.clone().add((Math.random() * 2 - 1) * offset.getX(), (Math.random() * 2 - 1) * offset.getY(), (Math.random() * 2 - 1) * offset.getZ()), amount, motion.getX(), motion.getY(), motion.getZ());
+		location.getWorld().spawnParticle(particle, location.clone().add((Math.random() * 2 - 1) * offset.getX(), (Math.random() * 2 - 1) * offset.getY(), (Math.random() * 2 - 1) * offset.getZ()), amount, motion.getX(), motion.getY(), motion.getZ(), data);
 		super.play(location);
 	}
 
@@ -49,6 +51,11 @@ public class ParticlePlayer extends EffectPlayer {
 
 	public ParticlePlayer withMotion(Vector motion) {
 		this.motion = motion;
+		return this;
+	}
+
+	public <T> ParticlePlayer withData(T data) {
+		this.data = data;
 		return this;
 	}
 }

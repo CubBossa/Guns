@@ -15,6 +15,16 @@ public class EffectPlayer {
         this.effects = new HashMap<>();
     }
 
+    public Map<EffectPlayer, Integer> getEffectPlayers(boolean deep) {
+        if (deep) {
+            Map<EffectPlayer, Integer> players = new HashMap<>();
+            effects.keySet().forEach(effectPlayer -> players.putAll(effectPlayer.getEffectPlayers(true)));
+            players.putAll(effects);
+            return players;
+        }
+        return new HashMap<>(effects);
+    }
+
     public void addEffect(int delay, EffectPlayer effect) {
         effects.put(effect, delay);
     }

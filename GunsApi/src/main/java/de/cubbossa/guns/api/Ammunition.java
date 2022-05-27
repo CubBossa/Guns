@@ -14,9 +14,5 @@ public interface Ammunition {
 
     int getMagazineCount();
 
-    void recharge(Gun gun, Player player);
-
-    boolean removeCount(Player player, int amount);
-
     GunProjectile getProjectile();
 }

@@ -20,6 +20,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>de.cubbossa</groupId>
             <artifactId>GunsApi</artifactId>
             <version>0.1</version>

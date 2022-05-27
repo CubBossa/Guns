@@ -82,7 +82,7 @@ public class GunsHandler {
 	}
 
 	public @Nullable Gun getGun(ItemStack stack) {
-		if(stack == null ||stack.getType() == Material.AIR) {
+		if(stack == null || stack.getType() == Material.AIR) {
 			return null;
 		}
 		ItemMeta meta = stack.getItemMeta();
@@ -139,7 +139,7 @@ public class GunsHandler {
 				.toList();
 	}
 
-	public void updateItemStack(ItemStack stack, @Nullable Ammunition type, int amount) {
+	public void updateItemStack(ItemStack stack, Gun gun, @Nullable Ammunition type, int amount) {
 		float percent = type == null ? 0 : amount / (float) type.getMagazineCount();
 		ItemMeta meta = stack.getItemMeta();
 		if (meta == null) {
@@ -151,7 +151,7 @@ public class GunsHandler {
 		if (meta instanceof Damageable damageable) {
 			damageable.setDamage((int) ((1 - percent) * stack.getType().getMaxDurability()));
 		}
-		meta.setLore(getLore(getGun(stack)));
+		meta.setLore(getLore(gun));
 		stack.setItemMeta(meta);
 	}
 

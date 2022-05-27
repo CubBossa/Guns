@@ -5,12 +5,12 @@ import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunProjectile;
 import de.cubbossa.guns.api.GunsHandler;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 @Getter
 @Setter
@@ -27,14 +27,6 @@ public class SimpleAmmunition implements Ammunition {
 
 	public int getCount(Player player) {
 		return Integer.MAX_VALUE;
-	}
-
-	public void recharge(Gun gun, Player player) {
-
-	}
-
-	public boolean removeCount(Player player, int amount) {
-		return true;
 	}
 
 	public GunProjectile getProjectile() {
