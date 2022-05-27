@@ -1,5 +1,6 @@
 package de.cubbossa.guns.api;
 
+import de.cubbossa.guns.api.attachments.Attachment;
 import de.cubbossa.guns.api.context.GunActionContext;
 import de.cubbossa.guns.api.context.HitContext;
 import de.cubbossa.guns.api.context.RechargeContext;
@@ -38,16 +39,22 @@ public class GunsHandler {
 	public NamespacedKey gunMetaKey;
 	public NamespacedKey gunChargedAmmoType;
 	public NamespacedKey gunChargedAmmoCount;
+	public NamespacedKey gunAttachments;
 	private final Map<NamespacedKey, Gun> gunsRegistry;
+	private final Map<NamespacedKey, Attachment> attachmentRegistry;
 	private final Map<NamespacedKey, Ammunition> ammoRegistry;
 
 	public GunsHandler(JavaPlugin plugin) {
 		instance = this;
+
 		this.plugin = plugin;
 		gunMetaKey = new NamespacedKey(plugin, "gunType");
 		gunChargedAmmoType = new NamespacedKey(plugin, "gunChargedAmmoType");
 		gunChargedAmmoCount = new NamespacedKey(plugin, "gunChargedAmmoCount");
+		gunAttachments = new NamespacedKey(plugin, "gunAttachments");
+
 		gunsRegistry = new HashMap<>();
+		attachmentRegistry = new HashMap<>();
 		ammoRegistry = new HashMap<>();
 
 		ACTION_SHOOT = createAction(new NamespacedKey(plugin, "simple_shoot"));
@@ -203,11 +210,75 @@ public class GunsHandler {
 	}
 
 	public void registerAmmunition(Ammunition ammunition) {
-		if (gunsRegistry.containsKey(ammunition.getKey())) {
+		if (ammoRegistry.containsKey(ammunition.getKey())) {
 			throw new IllegalArgumentException("An ammo with key '" + ammunition.getKey().toString() + "' already exists.");
 		}
 		this.ammoRegistry.put(ammunition.getKey(), ammunition);
 	}
 
+	public @Nullable Attachment getAttachment(NamespacedKey key) {
+		return attachmentRegistry.getOrDefault(key, null);
+	}
+
+	public void registerAttachment(Attachment attachment) {
+		if (attachmentRegistry.containsKey(attachment.getKey())) {
+			throw new IllegalArgumentException("An attachment with key '" + attachment.getKey().toString() + "' already exists.");
+		}
+		this.attachmentRegistry.put(attachment.getKey(), attachment);
+	}
+
+	public void addAttachment(ItemStack stack, Attachment attachment) {
+		ItemMeta meta = getMeta(stack);
+		String attachments = meta.getPersistentDataContainer().get(gunAttachments, PersistentDataType.STRING);
+		if (attachments == null || attachments.isEmpty()) {
+			attachments = attachment.getKey().toString();
+		} else {
+			attachments += "," + attachment.getKey().toString();
+		}
+		meta.getPersistentDataContainer().set(gunAttachments, PersistentDataType.STRING, attachments);
+		stack.setItemMeta(meta);
+	}
+
+	public void removeAttachment(ItemStack stack, Attachment attachment) {
+		ItemMeta meta = getMeta(stack);
+		String attachments = meta.getPersistentDataContainer().get(gunAttachments, PersistentDataType.STRING);
+		if (attachments == null || attachments.isEmpty()) {
+			return;
+		}
+		if (attachments.contains("," + attachment.getKey().toString())) {
+			attachments = attachments.replace("," + attachment.getKey().toString(), "");
+		} else if (attachments.contains(attachment.getKey().toString())) {
+			attachments = attachments.replace(attachment.getKey().toString(), "");
+		}
+		meta.getPersistentDataContainer().set(gunAttachments, PersistentDataType.STRING, attachments);
+		stack.setItemMeta(meta);
+	}
+
+	public void setAttachments(ItemStack stack, List<Attachment> attachments) {
+		ItemMeta meta = getMeta(stack);
+		meta.getPersistentDataContainer().set(gunAttachments, PersistentDataType.STRING, attachments.stream()
+				.map(a -> a.getKey().toString()).collect(Collectors.joining(",")));
+		stack.setItemMeta(meta);
+	}
+
+	public List<Attachment> getAttachments(ItemStack stack) {
+		ItemMeta meta = getMeta(stack);
+		String list = meta.getPersistentDataContainer().get(gunAttachments, PersistentDataType.STRING);
+		if (list == null) {
+			return new ArrayList<>();
+		}
+		return Arrays.stream(list.split(",")).map(NamespacedKey::fromString).map(this::getAttachment).collect(Collectors.toList());
+	}
+
+	private ItemMeta getMeta(ItemStack stack) {
+		ItemMeta meta = stack.getItemMeta();
+		if (meta == null) {
+			meta = Bukkit.getItemFactory().getItemMeta(stack.getType());
+		}
+		if (meta == null) {
+			throw new RuntimeException("Could not modify stack, meta was null.");
+		}
+		return meta;
+	}
 
 }

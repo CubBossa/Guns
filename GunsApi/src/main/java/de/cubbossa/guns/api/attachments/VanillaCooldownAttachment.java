@@ -3,13 +3,22 @@ package de.cubbossa.guns.api.attachments;
 import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunAction;
 import de.cubbossa.guns.api.context.GunActionContext;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class VanillaCooldownAttachment extends LogicAttachment {
 
+	private final NamespacedKey key;
 	private int ticks;
 
-	public VanillaCooldownAttachment(int ticks) {
+	public VanillaCooldownAttachment(NamespacedKey key, int ticks) {
+		this.key = key;
 		this.ticks = ticks;
 	}
 

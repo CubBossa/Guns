@@ -157,7 +157,6 @@ public class SimpleGun implements Gun {
 			}
 		}
 		if (context.isCancelled()) {
-			noAmmunitionEffectFactory.get().play(context.getPlayer().getEyeLocation());
 			return;
 		}
 

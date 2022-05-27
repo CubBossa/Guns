@@ -1,15 +1,16 @@
 package de.cubbossa.guns.plugin.handler;
 
 import de.cubbossa.guns.api.effects.EffectPlayer;
+import de.cubbossa.guns.api.effects.ParticlePlayer;
 import de.cubbossa.guns.api.effects.SoundPlayer;
 import lombok.Getter;
-import org.apache.commons.lang.SerializationException;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,24 +69,29 @@ public class EffectsHandler {
 		}
 	}
 
-	public void saveEffectToFile(File file, EffectPlayer effectPlayer, String key) {
+	public void saveEffectToFile(File file, EffectPlayer effectPlayer, String key) throws IOException {
 		YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
 		Map<EffectPlayer, Integer> players = effectPlayer.getEffectPlayers(true);
 		for (int amount : players.values().stream().distinct().sorted().toList()) {
-			cfg.set("delay_" + amount + "t", players.entrySet().stream()
+			cfg.set(key + ".delay_" + amount + "t", players.entrySet().stream()
 					.filter(e -> e.getValue() == amount)
 					.map(Map.Entry::getKey)
 					.map(this::serialize)
 					.collect(Collectors.toList()));
 		}
+
+		cfg.save(file);
 	}
 
 	public String serialize(EffectPlayer effectPlayer) {
 		if (effectPlayer instanceof SoundPlayer) {
 			return serializeSoundPlayer((SoundPlayer) effectPlayer);
+		} else if (effectPlayer instanceof ParticlePlayer) {
+			return serializeParticlePlayer((ParticlePlayer) effectPlayer);
 		}
-		throw new SerializationException("Could not serialize EffectPlayer of type " + effectPlayer.getClass().getName());
+		return "not serialized";
+		//throw new SerializationException("Could not serialize EffectPlayer of type " + effectPlayer.getClass().getName());
 	}
 
 	public EffectPlayer deserialize(String effectString) throws ParseException {
@@ -137,5 +143,10 @@ public class EffectsHandler {
 
 	public String serializeSoundPlayer(SoundPlayer soundPlayer) {
 		return "SoundPlayer[sound='" + soundPlayer.getSound().getKey() + "',volume=" + soundPlayer.getVolume() + ",pitch=" + soundPlayer.getPitch() + "]";
+	}
+
+	public String serializeParticlePlayer(ParticlePlayer particlePlayer) {
+		return "ParticlePlayer[type='" + particlePlayer.getParticle().toString() + "',amount=" + particlePlayer.getAmount() + ","
+				+ "motion=" + particlePlayer.getMotion().toString() + ",offset=" + particlePlayer.getOffset().toString() + "]";
 	}
 }
