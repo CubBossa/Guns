@@ -14,6 +14,7 @@ import de.cubbossa.guns.api.effects.SoundPlayer;
 import de.cubbossa.guns.implementations.SimpleAmmunition;
 import de.cubbossa.guns.implementations.SimpleGun;
 import de.cubbossa.guns.plugin.handler.EffectsHandler;
+import lombok.SneakyThrows;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -50,19 +51,15 @@ public class GunsAPI extends JavaPlugin {
 					.withData(new Particle.DustTransition(Color.fromRGB(0xFFCC66), Color.fromBGR(0xB3B3B3), 1f)))
 			.withEffect(4, new SoundPlayer(Sound.BLOCK_IRON_TRAPDOOR_CLOSE, 1f, 2f));
 
-	public void onEnable() {
+	@SneakyThrows public void onEnable() {
 
 		new GunsHandler(this);
-		new EffectsHandler();
 
 		Bukkit.getPluginManager().registerEvents(new GunListener(), this);
 
 		Gun gun = new SimpleGun(new NamespacedKey(this, "test-gun"));
 		Ammunition ammo = new SimpleAmmunition(new NamespacedKey(this, "test-ammo"));
 
-		Attachment attachment = new VanillaCooldownAttachment(new NamespacedKey(this, "vanilla-cooldown"), 40);
-
-		gun.addAttachment(attachment);
 		gun.addValidAmmunition(ammo);
 
 		gun.setNoAmmunitionEffectFactory(() -> new EffectPlayer()
@@ -82,16 +79,10 @@ public class GunsAPI extends JavaPlugin {
 			ItemStack stack = gun.createWeaponStack();
 			gun.setAmmunitionCharged(stack, ammo, 32);
 			GunsHandler.getInstance().updateItemStack(stack, gun, ammo, 32);
-			GunsHandler.getInstance().addAttachment(stack, attachment);
+			//GunsHandler.getInstance().addAttachment(stack, attachment);
 			((Player) sender).getInventory().addItem(stack);
 			return false;
 		});
 
-		EffectsHandler.getInstance().registerEffect("testxy", effect);
-		try {
-			EffectsHandler.getInstance().saveEffectToFile(new File(getDataFolder(), "effects.yml"), effect, "testxy");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

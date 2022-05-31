@@ -12,7 +12,6 @@ class EffectsHandlerTest {
 	@org.junit.jupiter.api.Test
 	void deserialize() throws ParseException {
 		new EffectsHandler().registerEffect("lol", new SoundPlayer(Sound.ENTITY_LEASH_KNOT_PLACE, 1f, 3.9817f));
-		System.out.println(EffectsHandler.getInstance().serializeSoundPlayer((SoundPlayer) EffectsHandler.getInstance().deserialize("Effect:lol")));
 
 	}
 

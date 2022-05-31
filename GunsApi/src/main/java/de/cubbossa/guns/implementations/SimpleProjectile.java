@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 @Setter
 public class SimpleProjectile implements GunProjectile {
 
-	private Vector velocity = new Vector(0, 6, 0);
+	private Vector velocity = new Vector(0, 3, 0);
 	private ItemStack displayItem = new ItemStack(Material.POLISHED_BLACKSTONE_BUTTON);
 	private float accuracy = 0;
 

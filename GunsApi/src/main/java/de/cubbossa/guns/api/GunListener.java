@@ -2,9 +2,11 @@ package de.cubbossa.guns.api;
 
 import de.cubbossa.guns.api.context.RechargeContext;
 import de.cubbossa.guns.api.context.ShootContext;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.logging.Level;
@@ -22,6 +24,13 @@ public class GunListener implements Listener {
 			}
 		} catch (Throwable e) {
 			GunsHandler.getInstance().getPlugin().getLogger().log(Level.SEVERE, "Could not call action for gun.", e);
+		}
+	}
+
+	@EventHandler
+	public void onHit(EntityDamageByEntityEvent event) {
+		if(event.getDamager().getType().equals(EntityType.SNOWBALL)) {
+			event.setDamage(10);
 		}
 	}
 }

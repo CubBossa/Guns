@@ -1,0 +1,88 @@
+options
+{
+    LOOKAHEAD=2;
+}
+PARSER_BEGIN(Example)
+
+// https://github.com/inqwell/json/blob/master/src/main/javacc/com/inqwell/json/JSON.jj
+
+public class Example {
+
+    public static void main(String args[]) throws ParseException {
+        Example parser = new Example(System.in);
+        parser.Input();
+    }
+}
+
+PARSER_END(Example)
+
+SKIP : {
+  " "
+| "\t"
+| "\n"
+| "\r"
+| <"#" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <"#-" (~["#"])* "-#">
+}
+
+TOKEN : { < DECLARATOR : ":" >
+| < SEPERATOR : "," >
+| < OPEN : "{" >
+| < CLOSE : "}" >
+| < LIST_OPEN : "[" >
+| < LIST_CLOSE : "]" >}
+
+TOKEN : {
+  < QUOTE_DOUBLE : "\"" ("\\" ~[] | ~["\"","\\"])* "\"" >
+| < QUOTE_SINGLE : "'" ("\\" ~[] | ~["'","\\"])* "'" >
+}
+
+TOKEN : {
+  < KEY : <ALPHANUM> ":" >
+}
+
+TOKEN : {
+  < INTEGER : (["0"-"9"])+ >
+| < BOOL : ("1" | "0") ("b" | "B") >
+| < FLOAT : <DIGIT> ("f" | "F") | <DIGIT> "." <DIGIT> ("f" | "F") >
+}
+
+TOKEN : {
+  < #DIGIT : (["0"-"9"])+ >
+| < #ALPHANUM : ( <DIGIT> | ["a"-"z"] | ["A"-"Z"] | "_" | "." )+ >
+}
+
+
+void BoolElement(): {
+    String key;
+    boolean value;
+} {
+    value = Key() <DECLARATOR> Bool() { return value; }
+}
+
+void Key(): {
+    Token t;
+} {
+    t = <KEY> { return t.image; }
+}
+
+void Bool(): {
+    Token t;
+} {
+    t = <BOOL> { return t.image.charAt(0) == '1'; }
+}
+
+
+/** Root production. */
+void Input() :
+{}
+{
+  MatchedBraces() ("\n"|"\r")* <EOF>
+}
+
+/** Brace matching production. */
+void MatchedBraces() :
+{}
+{
+  "{" [ MatchedBraces() ] "}"
+}
