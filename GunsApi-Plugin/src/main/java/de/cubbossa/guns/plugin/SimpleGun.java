@@ -1,4 +1,4 @@
-package de.cubbossa.guns.implementations;
+package de.cubbossa.guns.plugin;
 
 import de.cubbossa.guns.api.*;
 import de.cubbossa.guns.api.attachments.Attachment;
@@ -7,6 +7,7 @@ import de.cubbossa.guns.api.effects.EffectPlayer;
 import de.cubbossa.guns.api.effects.SoundPlayer;
 import lombok.Getter;
 import lombok.Setter;
+import nbo.NBOSerializable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -16,10 +17,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;

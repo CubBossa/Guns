@@ -1,8 +1,0 @@
-
-
-example:
-  delay_0t:
-    - "SoundPlayer[sound='minecraft:entity.leash_knot.place',volume=1.0,pitch=3.9817]"
-    - "SoundPlayer[sound='minecraft:entity.leash_knot.place',volume=1.0,pitch=3.9817]"
-  delay_4t:
-    - "SoundPlayer[sound='minecraft:entity.leash_knot.place',volume=1.0,pitch=3.9817]"

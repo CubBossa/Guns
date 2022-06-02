@@ -4,8 +4,8 @@ import de.cubbossa.guns.api.GunsHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EffectPlayer {
 
@@ -13,6 +13,11 @@ public class EffectPlayer {
 
     public EffectPlayer() {
         this.effects = new HashMap<>();
+    }
+
+    @Override
+    public EffectPlayer clone() {
+        return new EffectPlayer(); //TODO
     }
 
     public Map<EffectPlayer, Integer> getEffectPlayers(boolean deep) {
@@ -50,5 +55,26 @@ public class EffectPlayer {
                 entry.getKey().play(location);
             }
         }
+    }
+
+    public Map<String, Object> serialize() {
+        Map<String, Object> ret = new LinkedHashMap<>();
+        var all = getEffectPlayers(false);
+        all.values().stream().distinct().sorted().forEach(integer -> {
+            ret.put("delay_" + integer, all.entrySet().stream().filter(e -> e.getValue().equals(integer)).map(Map.Entry::getKey).collect(Collectors.toList()));
+        });
+        return ret;
+    }
+
+    public static EffectPlayer deserialize(Map<String, Object> values) {
+        EffectPlayer effectPlayer = new EffectPlayer();
+        for (var entry : values.entrySet().stream()
+                .filter(e -> e.getKey().startsWith("delay_"))
+                .filter(e -> e.getValue() instanceof List)
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), (List<EffectPlayer>) e.getValue()))
+                .collect(Collectors.toList())) {
+            entry.getValue().forEach(e -> effectPlayer.addEffect(Integer.parseInt(entry.getKey().replace("delay_", "")), e));
+        }
+        return effectPlayer;
     }
 }

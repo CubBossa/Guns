@@ -1,4 +1,4 @@
-package de.cubbossa.guns.implementations;
+package de.cubbossa.guns.plugin;
 
 import de.cubbossa.guns.api.GunProjectile;
 import lombok.Getter;

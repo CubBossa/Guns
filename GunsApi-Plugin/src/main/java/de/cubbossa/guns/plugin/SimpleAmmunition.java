@@ -1,7 +1,6 @@
-package de.cubbossa.guns.implementations;
+package de.cubbossa.guns.plugin;
 
 import de.cubbossa.guns.api.Ammunition;
-import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunProjectile;
 import de.cubbossa.guns.api.GunsHandler;
 import lombok.Getter;
@@ -10,7 +9,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 @Getter
 @Setter

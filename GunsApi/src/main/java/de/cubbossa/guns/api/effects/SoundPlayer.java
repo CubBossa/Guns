@@ -7,9 +7,8 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -42,5 +41,25 @@ public class SoundPlayer extends EffectPlayer {
             player.playSound(location, sound, volume, pitch);
         }
         super.play(location);
+    }
+
+    public Map<String, Object> serialize() {
+        Map<String, Object> ret = new LinkedHashMap<>();
+        ret.put("sound", sound.toString());
+        ret.put("volume", volume);
+        ret.put("pitch", pitch);
+        var subEffects = super.serialize();
+        if (!subEffects.isEmpty()) {
+            ret.put("effects", subEffects);
+        }
+        return ret;
+    }
+
+    public static SoundPlayer deserialize(Map<String, Object> values) {
+        var ret = new SoundPlayer((Sound) values.getOrDefault("sound", Sound.ENTITY_VILLAGER_NO),
+                (Float) values.getOrDefault("volume", 1),
+                (Float) values.getOrDefault("pitch", 1));
+        EffectPlayer.deserialize(values).getEffectPlayers(false).forEach((key, value) -> ret.addEffect(value, key));
+        return ret;
     }
 }

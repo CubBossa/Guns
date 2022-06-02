@@ -8,6 +8,8 @@ import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -34,8 +36,27 @@ public class ParticleLinePlayer extends ParticlePlayer {
 	}
 
 	@Override public void play(Location location) {
-		for(float i = 0; i < length; i += distance) {
+		for (float i = 0; i < length; i += distance) {
 			super.play(location.clone().add(location.getDirection().normalize().multiply(i)));
 		}
+	}
+
+	public Map<String, Object> serialize() {
+		Map<String, Object> ret = super.serialize();
+		ret.put("length", length);
+		ret.put("distance", distance);
+		return ret;
+	}
+
+	public static ParticleLinePlayer deserialize(Map<String, Object> values) {
+		var ret = new ParticleLinePlayer(Particle.valueOf((String) values.get("particle")),
+				(int) values.getOrDefault("amount", 1),
+				(Vector) values.getOrDefault("offset", new Vector()),
+				(float) values.getOrDefault("length", 1),
+				(float) values.getOrDefault("distance", 0.1f));
+		ret.withMotion((Vector) values.getOrDefault("motion", new Vector()));
+		ret.withData(values.getOrDefault("data", null));
+		EffectPlayer.deserialize(values).getEffectPlayers(false).forEach((key, value) -> ret.addEffect(value, key));
+		return ret;
 	}
 }

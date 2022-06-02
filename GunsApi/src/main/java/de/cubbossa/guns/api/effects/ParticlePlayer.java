@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.util.Vector;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -57,5 +59,31 @@ public class ParticlePlayer extends EffectPlayer {
 	public <T> ParticlePlayer withData(T data) {
 		this.data = data;
 		return this;
+	}
+
+	public Map<String, Object> serialize() {
+		Map<String, Object> ret = new LinkedHashMap<>();
+		ret.put("particle", particle.toString());
+		ret.put("amount", amount);
+		ret.put("offset", offset);
+		ret.put("motion", motion);
+		if (data != null) {
+			ret.put("data", data);
+		}
+		var subEffects = super.serialize();
+		if (!subEffects.isEmpty()) {
+			ret.put("effects", subEffects);
+		}
+		return ret;
+	}
+
+	public static ParticlePlayer deserialize(Map<String, Object> values) {
+		var ret = new ParticlePlayer(Particle.valueOf((String) values.get("particle")),
+				(int) values.getOrDefault("amount", 1),
+				(Vector) values.getOrDefault("offset", new Vector()),
+				(Vector) values.getOrDefault("motion", new Vector()),
+				values.getOrDefault("data", null));
+		EffectPlayer.deserialize(values).getEffectPlayers(false).forEach((key, value) -> ret.addEffect(value, key));
+		return ret;
 	}
 }

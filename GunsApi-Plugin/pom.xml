@@ -67,7 +67,13 @@
 
         <dependency>
             <groupId>de.cubbossa</groupId>
-            <artifactId>NBOParser</artifactId>
+            <artifactId>NBO-Core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.cubbossa</groupId>
+            <artifactId>NBO-Bukkit</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -93,6 +99,10 @@
                             <pattern>net.wesjd.anvilgui</pattern>
                             <shadedPattern>de.cubbossa.menuframework.anvilgui</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>nbo</pattern>
+                            <shadedPattern>de.cubbossa.nbo</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -108,6 +118,8 @@
                                     <include>de.cubbossa:MenuFramework</include>
                                     <include>net.kyori:**</include>
                                     <include>net.wesjd:anvilgui</include>
+                                    <include>de.cubbossa:NBO-Core</include>
+                                    <include>de.cubbossa:NBO-Bukkit</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
