@@ -9,9 +9,14 @@ import de.cubbossa.guns.api.effects.ParticlePlayer;
 import de.cubbossa.guns.api.effects.SoundPlayer;
 import de.cubbossa.guns.plugin.commands.GunsCommand;
 import de.cubbossa.guns.plugin.handler.ObjectsHandler;
+import de.cubbossa.menuframework.GUIHandler;
+import de.cubbossa.menuframework.inventory.InvMenuHandler;
 import de.cubbossa.translations.Message;
+import de.cubbossa.translations.TranslationHandler;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -21,9 +26,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import java.io.File;
 import java.util.Locale;
 import java.util.logging.Level;
 
+@Getter
 public class GunsAPI extends JavaPlugin {
 
 	/*
@@ -55,15 +62,28 @@ public class GunsAPI extends JavaPlugin {
 
 	@Getter
 	private static GunsAPI instance;
+	private MiniMessage miniMessage;
+	private BukkitAudiences audiences;
 
 	@SneakyThrows public void onEnable() {
 
 		instance = this;
 
+		saveResource("guns.nbo", false);
+
 		new GunsHandler(this);
 		ObjectsHandler objectsHandler = new ObjectsHandler();
 		objectsHandler.registerDefaults();
 		objectsHandler.loadFile();
+
+		audiences = BukkitAudiences.create(this);
+		miniMessage = MiniMessage.miniMessage();
+
+		TranslationHandler translationHandler = new TranslationHandler(this, audiences, miniMessage, new File(getDataFolder(), "/lang/"), "lang");
+		translationHandler.setFallbackLanguage("en_US");
+		translationHandler.setUseClientLanguage(true);
+
+		new GUIHandler(this).enable();
 
 		BukkitCommandManager commandManager = new BukkitCommandManager(this);
 		commandManager.addSupportedLanguage(Locale.ENGLISH);
@@ -72,11 +92,16 @@ public class GunsAPI extends JavaPlugin {
 		Bukkit.getPluginManager().registerEvents(new GunListener(), this);
 	}
 
-	public static void log(Level level, String message, Throwable t) {
+	@Override public void onDisable() {
+		GUIHandler.getInstance().disable();
+	}
 
+	public static void log(Level level, String message, Throwable t) {
+		instance.getLogger().log(level, message, t);
 	}
 
 	public static void sendMessage(CommandSender sender, Message message, TagResolver... resolvers) {
-
+		var aud = instance.audiences.sender(sender);
+		aud.sendMessage(message.asComponent(aud, resolvers));
 	}
 }

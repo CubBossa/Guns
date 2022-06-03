@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -43,9 +45,16 @@ public class SoundPlayer extends EffectPlayer {
         super.play(location);
     }
 
+    @Override
+    public SoundPlayer clone() {
+        var effect = new SoundPlayer().withSound(sound).withVolume(volume).withPitch(pitch);
+        getEffectPlayers(false).forEach((effectPlayer, integer) -> effect.addEffect(integer, effectPlayer.clone()));
+        return effect;
+    }
+
     public Map<String, Object> serialize() {
         Map<String, Object> ret = new LinkedHashMap<>();
-        ret.put("sound", sound.toString());
+        ret.put("sound", sound.getKey().toString());
         ret.put("volume", volume);
         ret.put("pitch", pitch);
         var subEffects = super.serialize();
@@ -56,10 +65,18 @@ public class SoundPlayer extends EffectPlayer {
     }
 
     public static SoundPlayer deserialize(Map<String, Object> values) {
-        var ret = new SoundPlayer((Sound) values.getOrDefault("sound", Sound.ENTITY_VILLAGER_NO),
+        var ret = new SoundPlayer(Registry.SOUNDS.get(NamespacedKey.fromString((String) values.get("sound"))),
                 (Float) values.getOrDefault("volume", 1),
                 (Float) values.getOrDefault("pitch", 1));
         EffectPlayer.deserialize(values).getEffectPlayers(false).forEach((key, value) -> ret.addEffect(value, key));
         return ret;
+    }
+
+    @Override public String toString() {
+        return "SoundPlayer{" +
+                "sound: " + sound +
+                ", volume: " + volume +
+                ", pitch: " + pitch +
+                '}';
     }
 }

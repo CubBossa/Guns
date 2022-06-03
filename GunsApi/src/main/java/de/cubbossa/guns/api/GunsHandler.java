@@ -77,8 +77,12 @@ public class GunsHandler {
 		gunsRegistry.put(gun.getKey(), gun);
 	}
 
+	public void unregisterGun(Gun gun) {
+		gunsRegistry.remove(gun.getKey());
+	}
+
 	public boolean isGun(ItemStack stack) {
-		if(stack == null ||stack.getType() == Material.AIR) {
+		if (stack == null || stack.getType() == Material.AIR) {
 			return false;
 		}
 		ItemMeta meta = stack.getItemMeta();
@@ -147,7 +151,7 @@ public class GunsHandler {
 	}
 
 	public void updateItemStack(ItemStack stack, Gun gun, @Nullable Ammunition type, int amount) {
-		float percent = type == null ? 0 : amount / (float) type.getMagazineCount();
+		float percent = type == null ? 0 : amount / (float) type.getMagazineSize();
 		ItemMeta meta = stack.getItemMeta();
 		if (meta == null) {
 			meta = Bukkit.getItemFactory().getItemMeta(stack.getType());

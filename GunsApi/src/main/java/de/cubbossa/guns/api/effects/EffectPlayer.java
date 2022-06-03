@@ -17,7 +17,9 @@ public class EffectPlayer {
 
     @Override
     public EffectPlayer clone() {
-        return new EffectPlayer(); //TODO
+        var effect = new EffectPlayer();
+        effects.forEach((effectPlayer, integer) -> effect.addEffect(integer, effectPlayer.clone()));
+        return effect;
     }
 
     public Map<EffectPlayer, Integer> getEffectPlayers(boolean deep) {

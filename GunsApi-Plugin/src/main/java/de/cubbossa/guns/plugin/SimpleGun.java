@@ -7,7 +7,6 @@ import de.cubbossa.guns.api.effects.EffectPlayer;
 import de.cubbossa.guns.api.effects.SoundPlayer;
 import lombok.Getter;
 import lombok.Setter;
-import nbo.NBOSerializable;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -17,7 +16,10 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -41,8 +43,6 @@ public class SimpleGun implements Gun {
 
 	public SimpleGun(NamespacedKey key) {
 		this.key = key;
-
-		GunsHandler.getInstance().registerGun(this);
 
 		addActionHandler(GunsHandler.ACTION_SHOOT, this::shoot);
 		addActionHandler(GunsHandler.ACTION_HIT, this::hit);
@@ -119,8 +119,8 @@ public class SimpleGun implements Gun {
 			return;
 		}
 
-		GunsHandler.getInstance().setAmmunition(context.getStack(), context.getAmmunition(), context.getAmmunition().getMagazineCount());
-		GunsHandler.getInstance().updateItemStack(context.getStack(), this, context.getAmmunition(), context.getAmmunition().getMagazineCount());
+		GunsHandler.getInstance().setAmmunition(context.getStack(), context.getAmmunition(), context.getAmmunition().getMagazineSize());
+		GunsHandler.getInstance().updateItemStack(context.getStack(), this, context.getAmmunition(), context.getAmmunition().getMagazineSize());
 		effectPlayer.play(context.getPlayer().getLocation());
 	}
 
@@ -162,6 +162,7 @@ public class SimpleGun implements Gun {
 
 		// Not enough ammunition charged
 		if (pair.getValue() < context.getAmmunitionCosts()) {
+			System.out.println(noAmmunitionEffectFactory.get());
 			noAmmunitionEffectFactory.get().play(context.getPlayer().getEyeLocation());
 			return;
 		}

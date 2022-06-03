@@ -1,27 +1,63 @@
-# IMPORTS (defines alias for classes)
+# IMPORTS
 
-<with SoundPlayer as de.cubbossa.guns.api.effects.SoundPlayer>
+<with Vector as org.bukkit.util.Vector>
+<with Effect as de.cubbossa.guns.api.effects.EffectPlayer>
+<with Sound as de.cubbossa.guns.api.effects.SoundPlayer>
+<with Projectile as de.cubbossa.guns.plugin.SerializableProjectile>
+<with Ammunition as de.cubbossa.guns.plugin.SerializableAmmunition>
+<with ItemStack as org.bukkit.inventory.ItemStack>
+<with Gun as de.cubbossa.guns.plugin.SerializableGun>
 
+# Projectiles
 
-
-# EFFECTS (define your effects here and reference them later with &<name>, like &explosion)
-
-effect2 = SoundPlayer{sound: "minecraft:entity.firework_rocket.blast", volume: 1f, pitch: 1f,
-    effects: {
-        0t: [
-            SoundPlayer{sound: "minecraft:lol",volume: 1f,pitch: 1f},
-            SoundPlayer{sound: "minecraft:lol",volume: 1f,pitch: 1f}
-        ],
-        4t: [
-            SoundPlayer{sound: "minecraft:lol",volume: 1f,pitch: 1f},
-            SoundPlayer{sound: "minecraft:lol",volume: 1f,pitch: 1f}
-        ]
-    }
+sound_shoot := Effect {
+    delay_0: [
+        Sound {sound: 'minecraft:block.iron_door.open', volume: 2.0f, pitch: 1.5f},
+        Sound {sound: 'minecraft:entity.firework_rocket.blast', volume: 4.0f, pitch: 2.0f},
+        Sound {sound: 'minecraft:entity.wither.break_block', volume: 0.15f, pitch: 0.5f},
+        Sound {sound: 'minecraft:entity.firework_rocket.blast', volume: 0.4f, pitch: 0.25f}
+    ],
+    delay_4: [
+        Sound {sound: 'minecraft:block.iron_trapdoor.close', volume: 1.0f, pitch: 2.0f}
+    ]
 }
 
-effect3 = EffectPlayer{effects: [
-    SoundPlayer{sound: "minecraft:lol",volume: 1f,pitch: 1f},
-    SoundPlayer{sound: "minecraft:lol",volume: 1f,pitch: 1f}
-]}
+sound_no_ammo := Effect {
+    delay_0: [
+        Sound {sound: "minecraft:block.iron_trapdoor.close", volume: 0.8f, pitch: 1.1f},
+        Sound {sound: "minecraft:block.dispenser.fail", volume: 0.6f, pitch: 1.8f}
+    ],
+    delay_4: [
+        Sound {sound: "minecraft:block.iron_trapdoor.close", volume: 0.5f, pitch: 1.3f}
+    ]
+}
 
-# GUNS
+just_projectile := Projectile {
+    entityType: 'minecraft:arrow',
+    accuracy: 0.0,
+    velocity: Vector {x: 1.0d, y: 0.0d, z: 0.0d}
+}
+
+# Ammo
+
+just_ammo := Ammunition {
+    name: '<gray>Just ammo',
+    magazineSize: 8,
+    projectile: &just_projectile,
+    key: 'gunsapi:simple_ammo'
+}
+
+# Guns
+
+just_gun := Gun {
+    item: ItemStack {v: 2975, type: 'STONE_HOE'},
+    valid_ammunition: [&just_ammo],
+    lore: [],
+    valid_attachments: [],
+    no_ammo_effect: &sound_no_ammo,
+    recharge_effect: null,
+    name: 'Just a Gun',
+    permission: null,
+    muzzle_effect: &sound_shoot,
+    key: 'gunsapi:simple_gun'
+}
