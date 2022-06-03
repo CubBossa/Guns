@@ -4,6 +4,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.List;
+
 public interface GunProjectile {
 
 	Vector getVelocity();
@@ -17,6 +19,12 @@ public interface GunProjectile {
 	float getAccuracy();
 
 	void setAccuracy(float accuracy);
+
+	List<Impact<?>> getImpacts();
+
+	<T> void addImpact(Impact<T> impact);
+
+	<T> void removeImpact(Impact<T> impact);
 
 	void create(Player player);
 }

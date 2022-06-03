@@ -28,6 +28,6 @@ public class SimpleAmmunition implements Ammunition {
 	}
 
 	public GunProjectile getProjectile() {
-		return new SimpleProjectile();
+		return new SerializableProjectile();
 	}
 }

@@ -5,6 +5,7 @@ import de.cubbossa.guns.api.context.ContextConsumer;
 import de.cubbossa.guns.api.context.GunActionContext;
 import de.cubbossa.guns.api.effects.EffectPlayer;
 import net.kyori.adventure.text.ComponentLike;
+import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,9 +16,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public interface Gun {
-
-	NamespacedKey getKey();
+public interface Gun extends Keyed {
 
 	ItemStack getItemStack();
 

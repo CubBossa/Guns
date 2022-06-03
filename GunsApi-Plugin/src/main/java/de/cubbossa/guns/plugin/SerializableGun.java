@@ -67,7 +67,8 @@ public class SerializableGun extends SimpleGun implements NBOSerializable {
 			throw new RuntimeException("Could not deserialize gun, map does not contain attribute '" + key + "'.");
 		}
 		try {
-			return (T) map.getOrDefault(key, ifAbsent);
+			T var = (T) map.getOrDefault(key, ifAbsent);
+			return var == null ? ifAbsent : var;
 		} catch (ClassCastException e) {
 			throw new RuntimeException("Could not deserialize gun, map does not contain attribute '" + key + "' of the correct type: " + ifAbsent.getClass());
 		}
