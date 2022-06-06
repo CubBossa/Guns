@@ -15,12 +15,10 @@ import de.cubbossa.menuframework.inventory.Action;
 import de.cubbossa.menuframework.inventory.Button;
 import de.cubbossa.menuframework.inventory.implementations.ListMenu;
 import nbo.NBOFile;
-import nbo.exception.NBOException;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -65,7 +63,7 @@ public class GunsCommand extends BaseCommand {
 		SerializableProjectile projectile = new SerializableProjectile();
 
 		SerializableAmmunition ammo = new SerializableAmmunition(new NamespacedKey(GunsAPI.getInstance(), "simple_ammo"));
-		ammo.setMagazineSize(8);
+		ammo.setBulletCount(8);
 		ammo.setNameFormat("<gray>Just ammo");
 		ammo.setProjectile(projectile);
 

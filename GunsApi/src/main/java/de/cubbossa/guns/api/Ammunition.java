@@ -10,7 +10,7 @@ public interface Ammunition extends Keyed {
 
     int getCount(Player player);
 
-    int getMagazineSize();
+    int getBulletCount();
 
     GunProjectile getProjectile();
 }

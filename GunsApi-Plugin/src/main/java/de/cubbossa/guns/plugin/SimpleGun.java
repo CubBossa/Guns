@@ -120,8 +120,8 @@ public class SimpleGun implements Gun {
 			return;
 		}
 
-		GunsHandler.getInstance().setAmmunition(context.getStack(), context.getAmmunition(), context.getAmmunition().getMagazineSize());
-		GunsHandler.getInstance().updateItemStack(context.getStack(), this, context.getAmmunition(), context.getAmmunition().getMagazineSize());
+		GunsHandler.getInstance().setAmmunition(context.getStack(), context.getAmmunition(), context.getAmmunition().getBulletCount());
+		GunsHandler.getInstance().updateItemStack(context.getStack(), this, context.getAmmunition(), context.getAmmunition().getBulletCount());
 		effectPlayer.play(context.getPlayer().getLocation());
 	}
 

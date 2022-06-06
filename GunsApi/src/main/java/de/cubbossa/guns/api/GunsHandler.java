@@ -5,8 +5,6 @@ import de.cubbossa.guns.api.context.GunActionContext;
 import de.cubbossa.guns.api.context.HitContext;
 import de.cubbossa.guns.api.context.RechargeContext;
 import de.cubbossa.guns.api.context.ShootContext;
-import de.cubbossa.guns.api.effects.EffectPlayer;
-import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -139,7 +137,7 @@ public class GunsHandler {
 	}
 
 	public void updateItemStack(ItemStack stack, Gun gun, @Nullable Ammunition type, int amount) {
-		float percent = type == null ? 0 : amount / (float) type.getMagazineSize();
+		float percent = type == null ? 0 : amount / (float) type.getBulletCount();
 		ItemMeta meta = stack.getItemMeta();
 		if (meta == null) {
 			meta = Bukkit.getItemFactory().getItemMeta(stack.getType());
