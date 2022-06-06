@@ -3,6 +3,7 @@ package de.cubbossa.guns.plugin;
 import co.aikar.commands.BukkitCommandManager;
 import de.cubbossa.guns.api.GunListener;
 import de.cubbossa.guns.api.GunsHandler;
+import de.cubbossa.guns.api.TrailsHandler;
 import de.cubbossa.guns.api.effects.EffectPlayer;
 import de.cubbossa.guns.api.effects.ParticleLinePlayer;
 import de.cubbossa.guns.api.effects.ParticlePlayer;
@@ -10,7 +11,6 @@ import de.cubbossa.guns.api.effects.SoundPlayer;
 import de.cubbossa.guns.plugin.commands.GunsCommand;
 import de.cubbossa.guns.plugin.handler.ObjectsHandler;
 import de.cubbossa.menuframework.GUIHandler;
-import de.cubbossa.menuframework.inventory.InvMenuHandler;
 import de.cubbossa.translations.Message;
 import de.cubbossa.translations.TranslationHandler;
 import lombok.Getter;
@@ -18,10 +18,7 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
@@ -69,6 +66,11 @@ public class GunsAPI extends JavaPlugin {
 
 		instance = this;
 
+		saveResource("imports.nbo", false);
+		saveResource("effects.nbo", false);
+		saveResource("impacts.nbo", false);
+		saveResource("projectiles.nbo", false);
+		saveResource("ammo.nbo", false);
 		saveResource("guns.nbo", false);
 
 		new GunsHandler(this);
@@ -90,6 +92,8 @@ public class GunsAPI extends JavaPlugin {
 		commandManager.registerCommand(new GunsCommand());
 
 		Bukkit.getPluginManager().registerEvents(new GunListener(), this);
+
+		new TrailsHandler(this);
 	}
 
 	@Override public void onDisable() {
@@ -102,6 +106,6 @@ public class GunsAPI extends JavaPlugin {
 
 	public static void sendMessage(CommandSender sender, Message message, TagResolver... resolvers) {
 		var aud = instance.audiences.sender(sender);
-		aud.sendMessage(message.asComponent(aud, resolvers));
+		aud.sendMessage(TranslationHandler.getInstance().translateLine(message, aud, resolvers));
 	}
 }

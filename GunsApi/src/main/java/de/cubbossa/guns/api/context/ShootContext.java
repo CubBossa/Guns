@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 public class ShootContext extends GunActionContext {
 
 	private EffectPlayer muzzleFlash;
-	private GunProjectile projectile;
+	private ProjectileContext projectile;
 	private Vector recoil;
 	private int ammunitionCosts;
 

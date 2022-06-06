@@ -5,6 +5,8 @@ import de.cubbossa.guns.api.context.GunActionContext;
 import de.cubbossa.guns.api.context.HitContext;
 import de.cubbossa.guns.api.context.RechargeContext;
 import de.cubbossa.guns.api.context.ShootContext;
+import de.cubbossa.guns.api.effects.EffectPlayer;
+import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -24,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Getter
 public class GunsHandler {
 
 	public static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
@@ -40,9 +43,9 @@ public class GunsHandler {
 	public NamespacedKey gunChargedAmmoType;
 	public NamespacedKey gunChargedAmmoCount;
 	public NamespacedKey gunAttachments;
-	private final Map<NamespacedKey, Gun> gunsRegistry;
-	private final Map<NamespacedKey, Attachment> attachmentRegistry;
-	private final Map<NamespacedKey, Ammunition> ammoRegistry;
+	private final HashedRegistry<Gun> gunsRegistry;
+	private final HashedRegistry<Attachment> attachmentRegistry;
+	private final HashedRegistry<Ammunition> ammoRegistry;
 
 	public GunsHandler(JavaPlugin plugin) {
 		instance = this;
@@ -53,9 +56,9 @@ public class GunsHandler {
 		gunChargedAmmoCount = new NamespacedKey(plugin, "gunChargedAmmoCount");
 		gunAttachments = new NamespacedKey(plugin, "gunAttachments");
 
-		gunsRegistry = new HashMap<>();
-		attachmentRegistry = new HashMap<>();
-		ammoRegistry = new HashMap<>();
+		gunsRegistry = new HashedRegistry<>();
+		attachmentRegistry = new HashedRegistry<>();
+		ammoRegistry = new HashedRegistry<>();
 
 		ACTION_SHOOT = createAction(new NamespacedKey(plugin, "simple_shoot"));
 		ACTION_HIT = createAction(new NamespacedKey(plugin, "simple_hit"));
@@ -64,21 +67,6 @@ public class GunsHandler {
 
 	public <C extends GunActionContext> GunAction<C> createAction(NamespacedKey key) {
 		return new GunAction<>(key);
-	}
-
-	public @Nullable Gun getGun(NamespacedKey key) {
-		return gunsRegistry.getOrDefault(key, null);
-	}
-
-	public void registerGun(Gun gun) {
-		if (gunsRegistry.containsKey(gun.getKey())) {
-			throw new IllegalArgumentException("A gun with key '" + gun.getKey().toString() + "' already exists.");
-		}
-		gunsRegistry.put(gun.getKey(), gun);
-	}
-
-	public void unregisterGun(Gun gun) {
-		gunsRegistry.remove(gun.getKey());
 	}
 
 	public boolean isGun(ItemStack stack) {
@@ -176,7 +164,7 @@ public class GunsHandler {
 		if (key == null || amount == null || key.equals("none")) {
 			return null;
 		}
-		Ammunition ammunition = getAmmunition(NamespacedKey.fromString(key));
+		Ammunition ammunition = ammoRegistry.get(NamespacedKey.fromString(key));
 		if (ammunition == null) {
 			return null;
 		}
@@ -207,28 +195,6 @@ public class GunsHandler {
 	public List<Component> deserializeLines(String text, TagResolver... resolver) {
 		MiniMessage mm = MiniMessage.miniMessage();
 		return Arrays.stream(text.split("\n")).map(s -> mm.deserialize(s, resolver)).collect(Collectors.toList());
-	}
-
-	public @Nullable Ammunition getAmmunition(NamespacedKey key) {
-		return ammoRegistry.getOrDefault(key, null);
-	}
-
-	public void registerAmmunition(Ammunition ammunition) {
-		if (ammoRegistry.containsKey(ammunition.getKey())) {
-			throw new IllegalArgumentException("An ammo with key '" + ammunition.getKey().toString() + "' already exists.");
-		}
-		this.ammoRegistry.put(ammunition.getKey(), ammunition);
-	}
-
-	public @Nullable Attachment getAttachment(NamespacedKey key) {
-		return attachmentRegistry.getOrDefault(key, null);
-	}
-
-	public void registerAttachment(Attachment attachment) {
-		if (attachmentRegistry.containsKey(attachment.getKey())) {
-			throw new IllegalArgumentException("An attachment with key '" + attachment.getKey().toString() + "' already exists.");
-		}
-		this.attachmentRegistry.put(attachment.getKey(), attachment);
 	}
 
 	public void addAttachment(ItemStack stack, Attachment attachment) {
@@ -271,7 +237,7 @@ public class GunsHandler {
 		if (list == null) {
 			return new ArrayList<>();
 		}
-		return Arrays.stream(list.split(",")).map(NamespacedKey::fromString).map(this::getAttachment).collect(Collectors.toList());
+		return Arrays.stream(list.split(",")).map(NamespacedKey::fromString).filter(Objects::nonNull).map(attachmentRegistry::get).collect(Collectors.toList());
 	}
 
 	private ItemMeta getMeta(ItemStack stack) {
@@ -284,5 +250,4 @@ public class GunsHandler {
 		}
 		return meta;
 	}
-
 }

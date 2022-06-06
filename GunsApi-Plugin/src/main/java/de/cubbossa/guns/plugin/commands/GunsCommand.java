@@ -6,13 +6,16 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunsHandler;
+import de.cubbossa.guns.api.attachments.Attachment;
+import de.cubbossa.guns.api.attachments.VanillaCooldownAttachment;
+import de.cubbossa.guns.api.impact.EntityImpact;
 import de.cubbossa.guns.plugin.*;
 import de.cubbossa.guns.plugin.handler.ObjectsHandler;
 import de.cubbossa.menuframework.inventory.Action;
 import de.cubbossa.menuframework.inventory.Button;
 import de.cubbossa.menuframework.inventory.implementations.ListMenu;
 import nbo.NBOFile;
-import nbo.NBOParseException;
+import nbo.exception.NBOException;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.NamespacedKey;
@@ -20,6 +23,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,11 +58,11 @@ public class GunsCommand extends BaseCommand {
 	}
 
 	@Subcommand("createFile")
-	public void onCreateFile(CommandSender sender) throws NBOParseException, ClassNotFoundException, IOException {
-		NBOFile file = NBOFile.loadString("", ObjectsHandler.getInstance().getSerializer());
+	public void onCreateFile(CommandSender sender) throws IOException {
+		NBOFile file = new NBOFile();
+		file.setSerializer(ObjectsHandler.getInstance().getSerializer());
 
 		SerializableProjectile projectile = new SerializableProjectile();
-		projectile.setProjectileType(EntityType.ARROW);
 
 		SerializableAmmunition ammo = new SerializableAmmunition(new NamespacedKey(GunsAPI.getInstance(), "simple_ammo"));
 		ammo.setMagazineSize(8);
@@ -66,23 +72,38 @@ public class GunsCommand extends BaseCommand {
 		SerializableGun gun = new SerializableGun(new NamespacedKey(GunsAPI.getInstance(), "simple_gun"));
 		gun.addValidAmmunition(ammo);
 
+		EntityImpact impact = new EntityImpact();
+		impact.setVelocity(new Vector(1, 2, 1023.9128));
+		impact.setDamage(123);
+		impact.setEffectPlayer(GunsAPI.EFFECT);
+		impact.getEffects().add(new PotionEffect(PotionEffectType.BLINDNESS, 1, 2, true));
+
+		file.setObject("just_impact", impact);
 		file.setObject("just_projectile", projectile);
 		file.setObject("just_ammo", ammo);
 		file.setObject("just_gun", gun);
 
-		file.save(new File(GunsAPI.getInstance().getDataFolder(), "guns.nbo"));
+		File f = new File(GunsAPI.getInstance().getDataFolder(), "guns_gen.nbo");
+		if (!f.exists()) {
+			f.createNewFile();
+		}
+		file.save(f);
 	}
 
 	@Subcommand("guns")
 	public void onGuns(Player player) {
+		Attachment attachment = new VanillaCooldownAttachment(new NamespacedKey(GunsAPI.getInstance(), "cooldown"), 10);
+		GunsHandler.getInstance().getAttachmentRegistry().put(attachment);
+
 		ListMenu menu = new ListMenu(Messages.GUNS_GUI_TITLE, 4);
-		for (Gun gun : ObjectsHandler.getInstance().getGunsRegistry().values()) {
+		for (Gun gun : GunsHandler.getInstance().getGunsRegistry()) {
 			menu.addListEntry(Button.builder()
 					.withItemStack(gun.createWeaponStack())
 					.withClickHandler(Action.LEFT, clickContext -> {
 						ItemStack stack = gun.createWeaponStack();
-						GunsHandler.getInstance().setAmmunition(stack, ObjectsHandler.getInstance().getAmmunitionRegistry().get("just_ammo"), 8);
-						GunsHandler.getInstance().updateItemStack(stack, gun, ObjectsHandler.getInstance().getAmmunitionRegistry().get("just_ammo"), 8);
+						GunsHandler.getInstance().setAmmunition(stack, GunsHandler.getInstance().getAmmoRegistry().get(NamespacedKey.fromString("gunsapi:simple_ammo")), 8);
+						GunsHandler.getInstance().updateItemStack(stack, gun, GunsHandler.getInstance().getAmmoRegistry().get(NamespacedKey.fromString("gunsapi:simple_ammo")), 8);
+						GunsHandler.getInstance().addAttachment(stack, attachment);
 						clickContext.getPlayer().getInventory().addItem(gun.createWeaponStack());
 					}));
 		}

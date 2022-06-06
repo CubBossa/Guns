@@ -1,0 +1,10 @@
+<include 'plugins/GunsAPI/imports.nbo'>
+<include 'plugins/GunsAPI/effects.nbo'>
+<include 'plugins/GunsAPI/impacts.nbo'>
+
+just_projectile := Projectile {
+    entity-type: 'minecraft:arrow',
+    accuracy: 0.0,
+    velocity: Vector {x: 1.0d, y: 1.0d, z: 1.0d},
+    entity-impact: &jump_impact
+}

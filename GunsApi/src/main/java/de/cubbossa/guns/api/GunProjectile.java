@@ -1,10 +1,9 @@
 package de.cubbossa.guns.api;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import de.cubbossa.guns.api.context.ProjectileContext;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
-
-import java.util.List;
 
 public interface GunProjectile {
 
@@ -12,19 +11,17 @@ public interface GunProjectile {
 
 	void setVelocity(Vector velocity);
 
-	ItemStack getDisplayItem();
-
-	void setDisplayItem(ItemStack displayItem);
-
 	float getAccuracy();
 
 	void setAccuracy(float accuracy);
 
-	List<Impact<?>> getImpacts();
+	Impact<Entity> getEntityImpact();
 
-	<T> void addImpact(Impact<T> impact);
+	Impact<Block> getBlockImpact();
 
-	<T> void removeImpact(Impact<T> impact);
+	void setEntityImpact(Impact<Entity> entityImpact);
 
-	void create(Player player);
+	void setBlockImpact(Impact<Block> entityImpact);
+
+	void create(ProjectileContext context);
 }

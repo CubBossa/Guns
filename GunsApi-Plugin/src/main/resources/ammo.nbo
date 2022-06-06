@@ -1,0 +1,10 @@
+<include 'plugins/GunsAPI/imports.nbo'>
+<include 'plugins/GunsAPI/effects.nbo'>
+<include 'plugins/GunsAPI/projectiles.nbo'>
+
+just_ammo := Ammunition {
+    name: '<gray>Just ammo',
+    magazineSize: 8,
+    projectile: &just_projectile,
+    key: 'gunsapi:simple_ammo'
+}

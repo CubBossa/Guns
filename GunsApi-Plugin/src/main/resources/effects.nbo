@@ -1,0 +1,13 @@
+<include 'plugins/GunsAPI/imports.nbo'>
+
+sound_shoot := Effect {
+    delay_0: [
+        Sound {sound: 'minecraft:block.iron_door.open', volume: 2.0f, pitch: 1.5f},
+        Sound {sound: 'minecraft:entity.firework_rocket.blast', volume: 4.0f, pitch: 2.0f},
+        Sound {sound: 'minecraft:entity.wither.break_block', volume: 0.15f, pitch: 0.5f},
+        Sound {sound: 'minecraft:entity.firework_rocket.blast', volume: 0.4f, pitch: 0.25f}
+    ],
+    delay_4: [
+        Sound {sound: 'minecraft:block.iron_trapdoor.close', volume: 1.0f, pitch: 2.0f}
+    ]
+}

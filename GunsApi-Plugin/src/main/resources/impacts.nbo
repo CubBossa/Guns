@@ -1,0 +1,12 @@
+<include 'plugins/GunsAPI/imports.nbo'>
+<include 'plugins/GunsAPI/effects.nbo'>
+
+jump_impact := EntityImpact {
+    damage: 1000,
+    potion_effects: [
+        PotionEffect {duration: 400, effect: 'minecraft:blindness', amplifier: 2},
+        PotionEffect {duration: 400, effect: 'minecraft:slow_falling', amplifier: 2}
+    ],
+    impact_effect: &sound_shoot,
+    velocity: Vector {x: 3.0d, y: 3.0d, z: 3.0d}
+}

@@ -1,0 +1,22 @@
+#
+# This file contains a lot of imports that you may not want to
+# add for every other file seperately. Just include this file with
+# <include 'plugins/GunsAPI/imports.nbo'> at the top of other files.
+#
+
+# Java
+<with HashSet as java.util.HashSet>
+
+# Bukkit
+<with Vector as org.bukkit.util.Vector>
+<with ItemStack as org.bukkit.inventory.ItemStack>
+<with PotionEffect as org.bukkit.potion.PotionEffect>
+
+# Guns API
+<with Effect as de.cubbossa.guns.api.effects.EffectPlayer>
+<with Sound as de.cubbossa.guns.api.effects.SoundPlayer>
+<with Projectile as de.cubbossa.guns.plugin.SerializableProjectile>
+<with Ammunition as de.cubbossa.guns.plugin.SerializableAmmunition>
+<with Gun as de.cubbossa.guns.plugin.SerializableGun>
+<with EntityImpact as de.cubbossa.guns.api.impact.EntityImpact>
+<with Particle as de.cubbossa.guns.api.effects.ParticlePlayer

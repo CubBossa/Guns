@@ -1,6 +1,9 @@
 package de.cubbossa.guns.plugin;
 
-import de.cubbossa.guns.api.*;
+import de.cubbossa.guns.api.Ammunition;
+import de.cubbossa.guns.api.Gun;
+import de.cubbossa.guns.api.GunAction;
+import de.cubbossa.guns.api.GunsHandler;
 import de.cubbossa.guns.api.attachments.Attachment;
 import de.cubbossa.guns.api.context.*;
 import de.cubbossa.guns.api.effects.EffectPlayer;
@@ -14,12 +17,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -138,8 +139,7 @@ public class SimpleGun implements Gun {
 
 		// Prepare shot
 		EffectPlayer flash = getMuzzleFlashFactory().get();
-		GunProjectile projectile = ammunition.getProjectile();
-		projectile.setVelocity(context.getPlayer().getLocation().getDirection().normalize().multiply(10));
+		ProjectileContext projectile = new ProjectileContext(ammunition.getProjectile(), context.getPlayer());
 
 		context.setMuzzleFlash(flash);
 		context.setProjectile(projectile);
@@ -162,7 +162,6 @@ public class SimpleGun implements Gun {
 
 		// Not enough ammunition charged
 		if (pair.getValue() < context.getAmmunitionCosts()) {
-			System.out.println(noAmmunitionEffectFactory.get());
 			noAmmunitionEffectFactory.get().play(context.getPlayer().getEyeLocation());
 			return;
 		}
@@ -173,7 +172,7 @@ public class SimpleGun implements Gun {
 		// Apply shot
 		player.setVelocity(player.getVelocity().add(context.getRecoil()));
 		flash.play(player.getEyeLocation());
-		projectile.create(player);
+		ammunition.getProjectile().create(projectile);
 	}
 
 	public void updateWeaponStack(ItemStack stack) {
@@ -193,6 +192,7 @@ public class SimpleGun implements Gun {
 		}
 		meta.setDisplayName(GunsHandler.LEGACY_SERIALIZER.serialize(GunsHandler.getInstance().deserializeLine(getName())));
 		meta.setLore(GunsHandler.getInstance().getLore(this));
+		meta.getPersistentDataContainer().set(new NamespacedKey(GunsAPI.getInstance(), "guns-id"), PersistentDataType.STRING, UUID.randomUUID().toString());
 		stack.setItemMeta(meta);
 
 		return GunsHandler.getInstance().setIdentifier(stack, this);

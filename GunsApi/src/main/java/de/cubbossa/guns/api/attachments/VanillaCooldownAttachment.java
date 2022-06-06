@@ -2,6 +2,7 @@ package de.cubbossa.guns.api.attachments;
 
 import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunAction;
+import de.cubbossa.guns.api.GunsHandler;
 import de.cubbossa.guns.api.context.GunActionContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

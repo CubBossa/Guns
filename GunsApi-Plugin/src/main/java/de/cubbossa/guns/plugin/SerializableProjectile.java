@@ -1,113 +1,98 @@
 package de.cubbossa.guns.plugin;
 
+import de.cubbossa.guns.api.GunListener;
 import de.cubbossa.guns.api.GunProjectile;
 import de.cubbossa.guns.api.Impact;
+import de.cubbossa.guns.api.TrailsHandler;
+import de.cubbossa.guns.api.context.ProjectileContext;
+import de.cubbossa.guns.api.effects.EffectPlayer;
+import de.cubbossa.guns.api.impact.BlockImpact;
+import de.cubbossa.guns.api.impact.EntityImpact;
 import lombok.Getter;
 import lombok.Setter;
 import nbo.NBOSerializable;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.entity.*;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
 public class SerializableProjectile implements GunProjectile, NBOSerializable {
 
-	private EntityType projectileType = EntityType.SNOWBALL;
-	private ItemStack displayItem = new ItemStack(Material.POLISHED_BLACKSTONE_BUTTON);
-	private Vector velocity = new Vector(1, 0, 0);
+	private EntityFactory entityFactory;
+	private Vector velocity = new Vector(1, 1, 1);
 	private float accuracy = 0;
-	private final List<Impact<?>> impacts;
-
-	public SerializableProjectile() {
-		impacts = new ArrayList<>();
-	}
-
-	@Override
-	public <T> void addImpact(Impact<T> impact) {
-		impacts.add(impact);
-	}
+	private Impact<Entity> entityImpact;
+	private Impact<Block> blockImpact;
+	private EffectPlayer trailEffect;
+	private int trailTicks = 10;
 
 	@Override
-	public <T> void removeImpact(Impact<T> impact) {
-		impacts.remove(impact);
-	}
+	public void create(ProjectileContext context) {
 
-	public void setProjectileType(EntityType projectileType) {
-		this.projectileType = projectileType;
-	}
-
-	@Override
-	public void create(Player player) {
-		if (projectileType == null) {
-			throw new RuntimeException("No projectile type provided!");
-		}
-		if (projectileType.getEntityClass().isAssignableFrom(Projectile.class)) {
-			Class<? extends Projectile> c = (Class<? extends Projectile>) projectileType.getEntityClass();
-			Projectile projectile = player.launchProjectile(c, velocity);
-			if (projectile instanceof Snowball snowball) {
-				snowball.setItem(displayItem);
+		Player player = context.getPlayer();
+		Entity entity = entityFactory.spawnEntity(player.getLocation(), location -> {
+			if (Projectile.class.isAssignableFrom(entityFactory.getEntityType().getEntityClass())) {
+				Class<? extends Projectile> c = (Class<? extends Projectile>) entityFactory.getEntityType().getEntityClass();
+				return player.launchProjectile(c, context.getVelocity());
+			} else {
+				Entity e = player.getLocation().getWorld().spawnEntity(player.getEyeLocation(), entityFactory.getEntityType());
+				e.setVelocity(context.getVelocity());
+				return e;
 			}
-		} else {
-			Entity projectile = player.getLocation().getWorld().spawnEntity(player.getLocation(), projectileType);
-			projectile.setVelocity(velocity);
+		});
+
+		if (entityImpact != null) {
+			GunListener.getInstance().entityImpacts.put(entity.getUniqueId(), entityImpact);
+		}
+		if (blockImpact != null) {
+			GunListener.getInstance().blockImpacts.put(entity.getUniqueId(), blockImpact);
+		}
+		if (trailEffect != null) {
+			TrailsHandler.getInstance().addTrail(entity, trailTicks, trailEffect);
 		}
 	}
 
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new LinkedHashMap<>();
-		map.put("entityType", projectileType.getKey().toString());
+		map.put("entity-factory", entityFactory);
 		map.put("velocity", velocity);
-		if (projectileType.equals(EntityType.SNOWBALL)) {
-			map.put("displayItem", displayItem);
-		}
-		if (!impacts.isEmpty()) {
-			map.put("impactActions", impacts);
-		}
+		map.put("entity-impact", entityImpact);
+		map.put("block-impact", blockImpact);
 		map.put("accuracy", accuracy);
+		map.put("trail-effect", trailEffect);
+		map.put("trail-ticks", trailTicks);
 		return map;
 	}
 
 	public static SerializableProjectile deserialize(Map<String, Object> map) {
 		SerializableProjectile projectile = new SerializableProjectile();
-		if (map.containsKey("entityType")) {
-			Object o = map.get("entityType");
-			if (o instanceof String string) {
-				projectile.setProjectileType(Registry.ENTITY_TYPE.get(NamespacedKey.fromString(string)));
-			}
+		if (map.containsKey("entity-factory") && map.get("entity-factory") instanceof EntityFactory factory) {
+			projectile.setEntityFactory(factory);
 		}
-		if (map.containsKey("velocity")) {
-			Object o = map.get("velocity");
-			if (o instanceof Vector vector) {
-				projectile.setVelocity(vector);
-			}
+		if (map.containsKey("velocity") && map.get("velocity") instanceof Vector vector) {
+			projectile.setVelocity(vector);
 		}
-		if (map.containsKey("displayItem")) {
-			Object o = map.get("displayItem");
-			if (o instanceof ItemStack displayItem) {
-				projectile.setDisplayItem(displayItem);
-			}
+		if (map.containsKey("accuracy") && map.get("accuracy") instanceof Float aFloat) {
+			projectile.setAccuracy(aFloat);
 		}
-		if (map.containsKey("accuracy")) {
-			Object o = map.get("accuracy");
-			if (o instanceof Float aFloat) {
-				projectile.setAccuracy(aFloat);
-			}
+		if (map.containsKey("entity-impact") && map.get("entity-impact") instanceof EntityImpact impact) {
+			projectile.entityImpact = impact;
 		}
-		if (map.containsKey("impactActions")) {
-			Object o = map.get("impactActions");
-			if (o instanceof List impacts) {
-				projectile.impacts.addAll(impacts);
-			}
+		if (map.containsKey("block-impact") && map.get("block-impact") instanceof BlockImpact impact) {
+			projectile.blockImpact = impact;
+		}
+		if (map.containsKey("trail-effect") && map.get("trail-effect") instanceof EffectPlayer effectPlayer) {
+			projectile.trailEffect = effectPlayer;
+		}
+		if (map.containsKey("trail-ticks") && map.get("trail-ticks") instanceof Integer ticks) {
+			projectile.trailTicks = ticks;
 		}
 		return projectile;
 	}
