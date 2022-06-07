@@ -1,3 +1,6 @@
+prefix: "<#365b87>GunShed</#365b87> <gray>»</gray> "
+
+
 reload:
-  success: "<green>success: <ms>"
-  error: "<red>Error, see console."
+  success: "<prefix><gray> 'guns.nbo' successfully reloaded in <green><ms></green><dark_green>ms<dark_green>"
+  error: "<red>An error occured while reloading 'guns.nbo':\n<red>------------------------------\n<red><error>\n<red>------------------------------"

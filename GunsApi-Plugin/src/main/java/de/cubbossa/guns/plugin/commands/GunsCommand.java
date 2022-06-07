@@ -15,6 +15,7 @@ import de.cubbossa.menuframework.inventory.Action;
 import de.cubbossa.menuframework.inventory.Button;
 import de.cubbossa.menuframework.inventory.implementations.ListMenu;
 import nbo.NBOFile;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.NamespacedKey;
@@ -45,13 +46,17 @@ public class GunsCommand extends BaseCommand {
 		CompletableFuture.runAsync(() -> {
 			ObjectsHandler.getInstance().loadFile();
 
-		}).thenRun(() -> {
-			GunsAPI.sendMessage(sender, Messages.RELOAD_SUCCESS, TagResolver.resolver("ms", Tag.preProcessParsed(System.currentTimeMillis() - now + "")));
-
 		}).exceptionally(throwable -> {
-			GunsAPI.sendMessage(sender, Messages.RELOAD_ERROR);
-			GunsAPI.log(Level.SEVERE, "Could not reload file, errors occured: ", throwable);
+			GunsAPI.sendMessage(sender, Messages.RELOAD_ERROR, TagResolver.builder()
+					.tag("error", Tag.inserting(Component.text(throwable.getMessage())))
+					.build());
+			GunsAPI.log(Level.SEVERE, "Could not reload guns.nbo, errors occured: ", throwable);
 			return null;
+
+		}).thenRun(() -> {
+			GunsAPI.sendMessage(sender, Messages.RELOAD_SUCCESS, TagResolver.builder()
+					.tag("ms", Tag.preProcessParsed(System.currentTimeMillis() - now + ""))
+					.build());
 		});
 	}
 
@@ -124,7 +129,7 @@ public class GunsCommand extends BaseCommand {
 		}
 	}
 
-	@Subcommand("editor effects")
+	@Subcommand("shed effects")
 	public void onEditorEffects(Player player) {
 		//preview item
 
