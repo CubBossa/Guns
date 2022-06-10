@@ -9,6 +9,7 @@ import de.cubbossa.guns.api.effects.ParticleLinePlayer;
 import de.cubbossa.guns.api.effects.ParticlePlayer;
 import de.cubbossa.guns.api.effects.SoundPlayer;
 import de.cubbossa.guns.plugin.commands.GunsCommand;
+import de.cubbossa.guns.plugin.configuration.Configuration;
 import de.cubbossa.guns.plugin.handler.ObjectsHandler;
 import de.cubbossa.menuframework.GUIHandler;
 import de.cubbossa.translations.Message;
@@ -20,7 +21,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -30,20 +33,18 @@ import java.util.logging.Level;
 @Getter
 public class GunsAPI extends JavaPlugin {
 
-	/*
-	Schrotflinte
-	Granatwerfer
-	Nebelgranaten
-	Flammenwerfer
-	Laserpointer
-	Rotpunktvisier
-	Infrarotvisier
-	Nachtsichtvisier
-	Doppeltes Magazin
-	Schalldämpfer
-	Bayonett
-	Griff -> akkurat
-	 */
+	public static final Color COLOR_BASIC = Color.fromBGR(0);
+	public static final String COLOR_BASIC_HEX = "#123456";
+	public static final Color COLOR_GUNS = Color.fromBGR(0); //TODO
+	public static final String COLOR_AMMO_HEX = "#11ff00";
+	public static final Color COLOR_AMMO = Color.fromBGR(0);
+	public static final String COLOR_ATTACH_HEX = "#0011ff";
+	public static final Color COLOR_ATTACH = Color.fromBGR(0);
+	public static final Color COLOR_EFFECTS = Color.fromBGR(0);
+	public static final Color COLOR_SOUND = Color.fromBGR(0);
+	public static final Color COLOR_PARTICLE = Color.fromBGR(0);
+
+	public static final Consumer<Player> SOUND_DECLINE = playSound(Sound.ENTITY_VILLAGER_NO);
 
 	public static final EffectPlayer EFFECT = new EffectPlayer()
 			.withEffect(new SoundPlayer(Sound.ENTITY_WITHER_BREAK_BLOCK, .15f, .5f))
@@ -62,7 +63,11 @@ public class GunsAPI extends JavaPlugin {
 	private MiniMessage miniMessage;
 	private BukkitAudiences audiences;
 
-	@SneakyThrows public void onEnable() {
+	@Getter
+	private Configuration configuration;
+
+	@SneakyThrows
+	public void onEnable() {
 
 		instance = this;
 
@@ -72,6 +77,8 @@ public class GunsAPI extends JavaPlugin {
 		saveResource("projectiles.nbo", false);
 		saveResource("ammo.nbo", false);
 		saveResource("guns.nbo", false);
+
+		this.configuration = new Configuration();
 
 		new GunsHandler(this);
 		ObjectsHandler objectsHandler = new ObjectsHandler();
@@ -96,7 +103,8 @@ public class GunsAPI extends JavaPlugin {
 		new TrailsHandler(this);
 	}
 
-	@Override public void onDisable() {
+	@Override
+	public void onDisable() {
 		GUIHandler.getInstance().disable();
 	}
 
@@ -107,5 +115,13 @@ public class GunsAPI extends JavaPlugin {
 	public static void sendMessage(CommandSender sender, Message message, TagResolver... resolvers) {
 		var aud = instance.audiences.sender(sender);
 		aud.sendMessage(TranslationHandler.getInstance().translateLine(message, aud, resolvers));
+	}
+
+	private static Consumer<Player> playSound(Sound sound) {
+		return player -> player.playSound(player.getLocation(), sound, 1f, 1f);
+	}
+
+	private static Consumer<Player> playSound(Sound sound, float volume, float pitch) {
+		return player -> player.playSound(player.getLocation(), sound, volume, pitch);
 	}
 }

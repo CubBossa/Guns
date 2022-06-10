@@ -4,16 +4,11 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
-import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunsHandler;
-import de.cubbossa.guns.api.attachments.Attachment;
-import de.cubbossa.guns.api.attachments.VanillaCooldownAttachment;
 import de.cubbossa.guns.api.impact.EntityImpact;
 import de.cubbossa.guns.plugin.*;
+import de.cubbossa.guns.plugin.editor.GunsBuilder;
 import de.cubbossa.guns.plugin.handler.ObjectsHandler;
-import de.cubbossa.menuframework.inventory.Action;
-import de.cubbossa.menuframework.inventory.Button;
-import de.cubbossa.menuframework.inventory.implementations.ListMenu;
 import nbo.NBOFile;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -95,22 +90,7 @@ public class GunsCommand extends BaseCommand {
 
 	@Subcommand("guns")
 	public void onGuns(Player player) {
-		Attachment attachment = new VanillaCooldownAttachment(new NamespacedKey(GunsAPI.getInstance(), "cooldown"), 10);
-		GunsHandler.getInstance().getAttachmentRegistry().put(attachment);
-
-		ListMenu menu = new ListMenu(Messages.GUNS_GUI_TITLE, 4);
-		for (Gun gun : GunsHandler.getInstance().getGunsRegistry()) {
-			menu.addListEntry(Button.builder()
-					.withItemStack(gun.createWeaponStack())
-					.withClickHandler(Action.LEFT, clickContext -> {
-						ItemStack stack = gun.createWeaponStack();
-						GunsHandler.getInstance().setAmmunition(stack, GunsHandler.getInstance().getAmmoRegistry().get(NamespacedKey.fromString("gunsapi:simple_ammo")), 8);
-						GunsHandler.getInstance().updateItemStack(stack, gun, GunsHandler.getInstance().getAmmoRegistry().get(NamespacedKey.fromString("gunsapi:simple_ammo")), 8);
-						GunsHandler.getInstance().addAttachment(stack, attachment);
-						clickContext.getPlayer().getInventory().addItem(gun.createWeaponStack());
-					}));
-		}
-		menu.open(player);
+		GunsBuilder.createGunsMenu(player).open(player);
 	}
 
 	@Subcommand("ammo|ammunition")
@@ -119,6 +99,7 @@ public class GunsCommand extends BaseCommand {
 		if (!GunsHandler.getInstance().isGun(gunStack)) {
 			GunsAPI.sendMessage(player, Messages.GUI_MUST_HOLD_GUN);
 		}
+		GunsBuilder.createAmmoMenu(gunStack, player).open(player);
 	}
 
 	@Subcommand("attach|attachment")
@@ -127,6 +108,7 @@ public class GunsCommand extends BaseCommand {
 		if (!GunsHandler.getInstance().isGun(gunStack)) {
 			GunsAPI.sendMessage(player, Messages.GUI_MUST_HOLD_GUN);
 		}
+		GunsBuilder.createAttachmentMenu(gunStack, player).open(player);
 	}
 
 	@Subcommand("shed effects")
