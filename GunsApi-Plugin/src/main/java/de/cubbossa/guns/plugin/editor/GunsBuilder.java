@@ -13,7 +13,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -34,12 +33,15 @@ public class GunsBuilder {
 
 		ListMenu menu = new ListMenu(Messages.G_GUNS_TITLE.asComponent(languageOwner), 4);
 		menu.addPreset(GunsEditor.bottomRow(3));
+		menu.addPreset(presetApplier -> {
+			presetApplier.addItemOnTop(3 * 9 + 4, ItemStackUtils.createInfoItem(Messages.G_GUNS_INFO_NAME, Messages.G_GUNS_INFO_LORE));
+		});
 		for (Gun gun : GunsHandler.getInstance().getGunsRegistry()) {
 			if (!gun.getUsePredicate().test(languageOwner)) {
 				continue;
 			}
 			menu.addListEntry(Button.builder()
-					.withItemStack(gun.createWeaponStack())
+					.withItemStack(() -> Objects.equals(selection.get(), gun) ? ItemStackUtils.setGlow(gun.createWeaponStack()) : gun.createWeaponStack())
 					.withClickHandler(Action.RIGHT, context -> {
 						if (!gun.getUsePredicate().test(context.getPlayer())) {
 							GunsAPI.SOUND_DECLINE.accept(context.getPlayer());
@@ -47,17 +49,20 @@ public class GunsBuilder {
 						}
 						selection.set(gun);
 						gunItem.set(gun.createWeaponStack());
+						menu.refreshDynamicItemSuppliers();
+						menu.refresh(menu.getSlots());
 					})
 					.withClickHandler(Action.LEFT, context -> {
 						if (!gun.getUsePredicate().test(context.getPlayer())) {
 							GunsAPI.SOUND_DECLINE.accept(context.getPlayer());
 							return;
 						}
-						context.getPlayer().getInventory().addItem(gun.getItemStack());
+						context.getPlayer().getInventory().addItem(gun.createWeaponStack());
+						context.getMenu().close(context.getPlayer());
 					}));
 		}
 		menu.addPreset(presetApplier -> {
-			if (selection.get() == null) {
+			if (selection.get() != null) {
 				presetApplier.addItemOnTop(3 * 9 + 6, ItemStackUtils.createItemStack(ItemStackUtils.MATERIAL_ATTACH, Messages.G_GUNS_ATTACH_NAME, Messages.G_GUNS_ATTACH_LORE));
 				presetApplier.addClickHandlerOnTop(3 * 9 + 6, Action.LEFT, clickContext -> {
 					if (clickContext.getMenu() instanceof TopInventoryMenu topMenu) {

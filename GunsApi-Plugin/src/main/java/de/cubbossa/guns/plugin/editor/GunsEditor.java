@@ -1,6 +1,5 @@
 package de.cubbossa.guns.plugin.editor;
 
-import de.cubbossa.guns.api.Ammunition;
 import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.GunsHandler;
 import de.cubbossa.guns.api.attachments.Attachment;

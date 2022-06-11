@@ -46,7 +46,7 @@ public class WorldEffectPlayer extends EffectPlayer {
 	}
 
 	public static WorldEffectPlayer deserialize(Map<String, Object> values) {
-		Effect e = (Effect) values.getOrDefault("effect", Effect.ANVIL_BREAK);
+		Effect e = Effect.valueOf((String) values.getOrDefault("effect", Effect.ANVIL_BREAK.toString()));
 		var ret = new WorldEffectPlayer(e, values.getOrDefault("data", null));
 		EffectPlayer.deserialize(values).getEffectPlayers(false).forEach((key, value) -> ret.addEffect(value, key));
 		return ret;

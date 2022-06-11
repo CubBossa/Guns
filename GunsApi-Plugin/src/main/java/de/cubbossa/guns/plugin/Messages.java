@@ -14,6 +14,8 @@ public class Messages {
 
 	@MessageMeta(value = "<#365b87>GunShed</#365b87> <gray>»</gray> ")
 	public static final Message PREFIX = new Message("prefix");
+	@MessageMeta(value = "<gold>Info</gold>")
+	public static final Message INFO = new Message("info");
 
 	@MessageMeta(value = "<gold>Previous Page</gold>")
 	public static final Message GUI_PREV_PAGE_NAME = new Message("gui.general.prev_page.name");
@@ -38,7 +40,7 @@ public class Messages {
 	public static final Message GUI_ERROR_LORE = new Message("gui.general.error.lore");
 
 
-	@MessageMeta(value = "<prefix><gray> 'guns.nbo' successfully reloaded in <green><ms></green><dark_green>ms<dark_green><gray>.</gray>",
+	@MessageMeta(value = "<message:prefix><gray> 'guns.nbo' successfully reloaded in <green><ms></green><dark_green>ms<dark_green><gray>.</gray>",
 			placeholders = "ms")
 	public static final Message RELOAD_SUCCESS = new Message("command.reload.success");
 	@MessageMeta(value = """
@@ -52,6 +54,14 @@ public class Messages {
 
 	@MessageMeta(value = "Click a gun to equip")
 	public static final Message G_GUNS_TITLE = new Message("gui.guns.title");
+	@MessageMeta(value = "<message:info>")
+	public static final Message G_GUNS_INFO_NAME = new Message("gui.guns.info.name");
+	@MessageMeta(value = """
+			<gray>»</gray> <yellow>left-click:</yellow> <gray>get gun</gray>
+			<gray>»</gray> <yellow>right-click:</yellow> <gray>select gun<gray>
+			""")
+	public static final Message G_GUNS_INFO_LORE = new Message("gui.guns.info.lore");
+
 	@MessageMeta(value = "<" + GunsAPI.COLOR_AMMO_HEX + ">Ammunition</" + GunsAPI.COLOR_AMMO_HEX + ">")
 	public static final Message G_GUNS_AMMO_NAME = new Message("gui.guns.ammunition.name");
 	@MessageMeta(value = """
@@ -61,7 +71,7 @@ public class Messages {
 			<gray>from your inventory.
 			""")
 	public static final Message G_GUNS_AMMO_LORE = new Message("gui.guns.ammunition.lore");
-	@MessageMeta(value = "<" + GunsAPI.COLOR_ATTACH_HEX + ">Ammunition</" + GunsAPI.COLOR_ATTACH_HEX + ">")
+	@MessageMeta(value = "<" + GunsAPI.COLOR_ATTACH_HEX + ">Attachments</" + GunsAPI.COLOR_ATTACH_HEX + ">")
 	public static final Message G_GUNS_ATTACH_NAME = new Message("gui.guns.attachments.name");
 	@MessageMeta(value = """
 			<gray>Add attachments to your gun
@@ -70,13 +80,13 @@ public class Messages {
 	public static final Message G_GUNS_ATTACH_LORE = new Message("gui.guns.attachments.lore");
 	@MessageMeta(value = "<message:gui.guns.attachments.name>")
 	public static final Message G_ATTACH_TITLE = new Message("gui.attachments.title");
-	@MessageMeta(value = "<gold>Info</gold>")
+	@MessageMeta(value = "<message:info>")
 	public static final Message G_ATTACH_INFO_NAME = new Message("gui.attachments.info.name");
 	@MessageMeta(value = "<message:gui.guns.attachments.name>")
 	public static final Message G_ATTACH_INFO_LORE = new Message("gui.attachments.info.lore");
 	@MessageMeta(value = "<message:gui.guns.ammunition.name>")
 	public static final Message G_AMMO_TITLE = new Message("gui.ammunition.title");
-	@MessageMeta(value = "<gold>Info</gold>")
+	@MessageMeta(value = "<message:info>")
 	public static final Message G_AMMO_INFO_NAME = new Message("gui.ammunition.info.name");
 	@MessageMeta(value = "<message:gui.guns.ammunition.name>")
 	public static final Message G_AMMO_INFO_LORE = new Message("gui.ammunition.info.lore");
@@ -119,7 +129,7 @@ public class Messages {
 
 	@MessageMeta(value = "Edit Your Gun Types")
 	public static final Message E_GUNS_TITLE = new Message("gui.editor.guns.title");
-	@MessageMeta(value = "<gold>Info</gold>")
+	@MessageMeta(value = "<message:info>")
 	public static final Message E_GUNS_INFO_NAME = new Message("gui.editor.guns.info.name");
 	@MessageMeta(value = """
 			<gray>»</gray> <yellow>left-click:</yellow> <gray>edit gun</gray>

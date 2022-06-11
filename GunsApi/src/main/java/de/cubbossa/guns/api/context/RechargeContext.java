@@ -1,6 +1,7 @@
 package de.cubbossa.guns.api.context;
 
 import de.cubbossa.guns.api.Ammunition;
+import de.cubbossa.guns.api.Gun;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.entity.Player;
@@ -13,8 +14,8 @@ public class RechargeContext extends GunActionContext {
 
     private Ammunition ammunition;
 
-    public RechargeContext(Player player, ItemStack stack, Cancellable cancellable, Ammunition ammunition) {
-        super(player, stack, cancellable);
+    public RechargeContext(Gun gun, Player player, ItemStack stack, Cancellable cancellable, Ammunition ammunition) {
+        super(gun, player, stack, cancellable);
         this.ammunition = ammunition;
     }
 }

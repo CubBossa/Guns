@@ -38,7 +38,7 @@ public interface Gun extends Keyed {
 
 	List<Ammunition> getValidAmmunition();
 
-	Ammunition getFirstFittingAmmunition();
+	Ammunition getFirstFittingAmmunition(Player player);
 
 	Map.Entry<Ammunition, Integer> getAmmunitionCharged(ItemStack stack);
 

@@ -13,7 +13,6 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -170,20 +169,14 @@ public class GunsHandler {
 	}
 
 	public <C extends GunActionContext> void perform(GunAction<C> action, C context) throws Throwable {
-		Gun gun = getGun(context.getStack());
-		// Item is not a gun
-		if (gun == null) {
-			return;
-		}
 
-		Player player = context.getPlayer();
 		// Player not allowed to use gun
-		if (!gun.getUsePredicate().test(player)) {
+		if (!context.getGun().getUsePredicate().test(context.getPlayer())) {
 			return;
 		}
 
 		// Let gun handle
-		gun.perform(action, context);
+		context.getGun().perform(action, context);
 	}
 
 	public Component deserializeLine(String text, TagResolver... resolver) {

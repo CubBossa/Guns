@@ -3,8 +3,6 @@ package de.cubbossa.guns.api;
 import de.cubbossa.guns.api.context.RechargeContext;
 import de.cubbossa.guns.api.context.ShootContext;
 import lombok.Getter;
-import org.bukkit.Particle;
-import org.bukkit.Registry;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Projectile;
@@ -35,11 +33,15 @@ public class GunListener implements Listener {
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		try {
+			Gun gun = GunsHandler.getInstance().getGun(event.getItem());
+			if (gun == null) {
+				return;
+			}
 			//TODO actually senseless to create ful contexts here.
 			if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				GunsHandler.getInstance().perform(GunsHandler.ACTION_RECHARGE, new RechargeContext(event.getPlayer(), event.getItem(), event, null));
+				GunsHandler.getInstance().perform(GunsHandler.ACTION_RECHARGE, new RechargeContext(gun, event.getPlayer(), event.getItem(), event, null));
 			} else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				GunsHandler.getInstance().perform(GunsHandler.ACTION_SHOOT, new ShootContext(event.getPlayer(), event.getItem(), event));
+				GunsHandler.getInstance().perform(GunsHandler.ACTION_SHOOT, new ShootContext(gun, event.getPlayer(), event.getItem(), event));
 			}
 		} catch (Throwable e) {
 			GunsHandler.getInstance().getPlugin().getLogger().log(Level.SEVERE, "Could not call action for gun.", e);

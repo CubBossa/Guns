@@ -1,5 +1,6 @@
 package de.cubbossa.guns.api.context;
 
+import de.cubbossa.guns.api.Gun;
 import de.cubbossa.guns.api.effects.EffectPlayer;
 import de.cubbossa.guns.api.GunProjectile;
 import lombok.Getter;
@@ -18,7 +19,7 @@ public class ShootContext extends GunActionContext {
 	private Vector recoil;
 	private int ammunitionCosts;
 
-	public ShootContext(Player player, ItemStack itemStack, Cancellable cancellable) {
-		super(player, itemStack, cancellable);
+	public ShootContext(Gun gun, Player player, ItemStack itemStack, Cancellable cancellable) {
+		super(gun, player, itemStack, cancellable);
 	}
 }

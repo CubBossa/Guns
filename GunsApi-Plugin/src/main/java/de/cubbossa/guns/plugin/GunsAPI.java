@@ -22,6 +22,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Consumer;
 import org.bukkit.util.Vector;
@@ -83,14 +84,18 @@ public class GunsAPI extends JavaPlugin {
 		new GunsHandler(this);
 		ObjectsHandler objectsHandler = new ObjectsHandler();
 		objectsHandler.registerDefaults();
-		objectsHandler.loadFile();
 
 		audiences = BukkitAudiences.create(this);
 		miniMessage = MiniMessage.miniMessage();
 
-		TranslationHandler translationHandler = new TranslationHandler(this, audiences, miniMessage, new File(getDataFolder(), "/lang/"), "lang");
+		TranslationHandler translationHandler = new TranslationHandler(this, audiences, miniMessage, new File(getDataFolder(), "lang/"), "lang");
 		translationHandler.setFallbackLanguage("en_US");
-		translationHandler.setUseClientLanguage(true);
+		translationHandler.setUseClientLanguage(false);
+		translationHandler.registerAnnotatedLanguageClass(Messages.class);
+		translationHandler.loadLanguages(Locale.US);
+
+		loadAsync();
+		load();
 
 		new GUIHandler(this).enable();
 
@@ -106,6 +111,29 @@ public class GunsAPI extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		GUIHandler.getInstance().disable();
+	}
+
+	public void unload() throws Exception {
+		for (NamespacedKey recipe : ObjectsHandler.getInstance().getCustomRecipeRegistry().keySet()) {
+			Bukkit.removeRecipe(recipe);
+		}
+		ObjectsHandler.getInstance().getCustomRecipeRegistry().clear();
+	}
+
+	public void unloadAsync() throws Exception {
+
+	}
+
+	public void loadAsync() throws Exception {
+		ObjectsHandler.getInstance().loadFile();
+		TranslationHandler.getInstance().loadLanguages();
+	}
+
+	public void load() throws Exception {
+
+		for (Recipe recipe : ObjectsHandler.getInstance().getCustomRecipeRegistry().values()) {
+			Bukkit.addRecipe(recipe);
+		}
 	}
 
 	public static void log(Level level, String message, Throwable t) {
