@@ -12,7 +12,9 @@ import de.cubbossa.guns.plugin.commands.GunsCommand;
 import de.cubbossa.guns.plugin.configuration.Configuration;
 import de.cubbossa.guns.plugin.handler.ObjectsHandler;
 import de.cubbossa.menuframework.GUIHandler;
+import de.cubbossa.menuframework.protocol.ProtocolLibListener;
 import de.cubbossa.translations.Message;
+import de.cubbossa.translations.PacketTranslationHandler;
 import de.cubbossa.translations.TranslationHandler;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -98,6 +100,8 @@ public class GunsAPI extends JavaPlugin {
 		load();
 
 		new GUIHandler(this).enable();
+		new ProtocolLibListener(this);
+		new PacketTranslationHandler(this);
 
 		BukkitCommandManager commandManager = new BukkitCommandManager(this);
 		commandManager.addSupportedLanguage(Locale.ENGLISH);

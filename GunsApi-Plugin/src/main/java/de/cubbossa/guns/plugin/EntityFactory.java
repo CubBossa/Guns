@@ -50,7 +50,6 @@ public class EntityFactory {
 	 * e.g. {id:"minecraft:donkey",Passengers:[{id:"minecraft:wolf",Passengers:[{id:"minecraft:cat"}]}]}
 	 */
 	private Entity fromNBT(NBTCompound nbtContainer) {
-		System.out.println(nbtContainer.toString());
 		String keyString = nbtContainer.getString("id");
 		if (keyString == null) {
 			throw new SerializationException("Could not summon entity, no 'id' attribute provided.");

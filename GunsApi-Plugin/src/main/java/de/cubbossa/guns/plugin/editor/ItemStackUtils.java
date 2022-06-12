@@ -5,6 +5,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import de.cubbossa.guns.plugin.GunsAPI;
 import de.cubbossa.menuframework.util.DurationParser;
+import de.cubbossa.translations.MenuIcon;
 import de.cubbossa.translations.Message;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -29,9 +30,11 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -228,14 +231,14 @@ public class ItemStackUtils {
 		return itemStack;
 	}
 
-	public ItemStack createErrorItem(ComponentLike errorName, List<? extends ComponentLike> errorDescription) {
+	public ItemStack createErrorItem(Message errorName, Message errorDescription, TagResolver error) {
 		ItemStack stack = Icon.STACK_WARNING_RP.clone();
-		return setNameAndLore(stack, errorName, errorDescription);
+		return new MenuIcon.Builder(stack).withName(errorName).withLore(errorDescription)
+				.withLoreResolver(error).build().createItem();
 	}
 
 	public ItemStack createInfoItem(Message name, Message lore) {
-		ItemStack stack = new ItemStack(Material.PAPER, 1);
-		stack = setNameAndLore(stack, name, lore);
+		ItemStack stack = new MenuIcon(new ItemStack(Material.PAPER, 1), name, lore).createItem();
 		stack = setCustomModelData(stack, 7121000);
 		return stack;
 	}

@@ -121,7 +121,7 @@ public class GunsCommand extends BaseCommand {
 		if (!GunsHandler.getInstance().isGun(gunStack)) {
 			GunsAPI.sendMessage(player, Messages.GUI_MUST_HOLD_GUN);
 		}
-		GunsBuilder.createAmmoMenu(gunStack, player).open(player);
+		GunsBuilder.createAmmoMenu(gunStack).open(player);
 	}
 
 	@Subcommand("attach|attachment")
@@ -130,7 +130,7 @@ public class GunsCommand extends BaseCommand {
 		if (!GunsHandler.getInstance().isGun(gunStack)) {
 			GunsAPI.sendMessage(player, Messages.GUI_MUST_HOLD_GUN);
 		}
-		GunsBuilder.createAttachmentMenu(gunStack, player).open(player);
+		GunsBuilder.createAttachmentMenu(gunStack).open(player);
 	}
 
 	@Subcommand("shed effects")

@@ -76,8 +76,20 @@
 
         <dependency>
             <groupId>de.cubbossa</groupId>
-            <artifactId>translations_framework</artifactId>
-            <version>0.1</version>
+            <artifactId>MenuFramework</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.cubbossa</groupId>
+            <artifactId>MenuFramework-Protocol-Extension</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.cubbossa</groupId>
+            <artifactId>Translations</artifactId>
+            <version>1.0</version>
         </dependency>
 
         <dependency>
@@ -146,8 +158,10 @@
                             <artifactSet>
                                 <includes>
                                     <include>de.cubbossa:GunsApi</include>
-                                    <include>de.cubbossa:translations_framework</include>
-                                    <include>com.github.CubBossa.MenuFramework:MenuFramework</include>
+                                    <include>de.cubbossa:Translations</include>
+                                    <include>de.cubbossa:MenuFramework</include>
+                                    <include>de.cubbossa:MenuFramework-Protocol-Extension</include>
+                                    <!--<include>com.github.CubBossa.MenuFramework:MenuFramework</include>-->
                                     <include>net.kyori:**</include>
                                     <include>net.wesjd:anvilgui</include>
                                     <include>de.cubbossa:NBO-Core</include>

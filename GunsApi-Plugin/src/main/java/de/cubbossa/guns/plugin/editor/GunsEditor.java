@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 public class GunsEditor {
 
 	public static Menu createGunsEditor() {
-		ListEditorMenu<Gun> menu = new ListEditorMenu<>(Messages.E_GUNS_TITLE, 4, new ListMenuSupplier<Gun>() {
+		ListEditorMenu<Gun> menu = new ListEditorMenu<>(Messages.E_GUNS_TITLE, 4, new ListMenuSupplier<>() {
 			@Override
 			public Collection<Gun> getElements() {
 				//TODO only sorts tagged name, like <yellow> after <red>
@@ -102,7 +102,7 @@ public class GunsEditor {
 		menu.addPreset(MenuPresets.back(1, Action.LEFT));
 		menu.setClickHandler(0, AnvilMenu.WRITE, s -> {
 			if (validator != null && !validator.getInputValidator().test(s.getTarget())) {
-				menu.setItem(2, ItemStackUtils.createErrorItem(Messages.GUI_WARNING_NAME.asComponent(), validator.getErrorMessage().asComponents(TagResolver.resolver("format", Tag.inserting(validator.getRequiredFormat())))));
+				menu.setItem(2, ItemStackUtils.createErrorItem(Messages.GUI_WARNING_NAME, validator.getErrorMessage(), TagResolver.resolver("format", Tag.inserting(validator.getRequiredFormat()))));
 			} else {
 				menu.setItem(2, Icon.ACCEPT_RP);
 			}

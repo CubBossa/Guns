@@ -36,12 +36,12 @@ public class SerializableProjectile implements GunProjectile, NBOSerializable {
 	public void create(ProjectileContext context) {
 
 		Player player = context.getPlayer();
-		Entity entity = entityFactory.spawnEntity(player.getLocation(), location -> {
-			if (Projectile.class.isAssignableFrom(entityFactory.getEntityType().getEntityClass())) {
-				Class<? extends Projectile> c = (Class<? extends Projectile>) entityFactory.getEntityType().getEntityClass();
+		Entity entity = entityFactory.spawnEntity(player.getLocation(), (entityType, location) -> {
+			if (Projectile.class.isAssignableFrom(entityType.getEntityClass())) {
+				Class<? extends Projectile> c = (Class<? extends Projectile>) entityType.getEntityClass();
 				return player.launchProjectile(c, context.getVelocity());
 			} else {
-				Entity e = player.getLocation().getWorld().spawnEntity(player.getEyeLocation(), entityFactory.getEntityType());
+				Entity e = player.getLocation().getWorld().spawnEntity(player.getEyeLocation(), entityType);
 				e.setVelocity(context.getVelocity());
 				return e;
 			}

@@ -2,6 +2,7 @@ package de.cubbossa.guns.plugin.editor;
 
 import de.cubbossa.guns.plugin.Messages;
 import de.cubbossa.menuframework.inventory.MenuPresets;
+import de.cubbossa.translations.MenuIcon;
 import de.cubbossa.translations.Message;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -73,16 +74,22 @@ public class Icon {
 	}
 
 	private static ItemStack icon(Material material, Message displayName, Message lore, int customModelData) {
-		ItemStack item = ItemStackUtils.createItemStack(material, displayName, lore.asComponents());
+		ItemStack item = new MenuIcon.Builder(new ItemStack(material))
+				.withName(displayName)
+				.withLore(lore)
+				.build().createItem();
 		return ItemStackUtils.setCustomModelData(item, customModelData);
 	}
 
 	private static ItemStack icon(String headUrl, Message name, Message lore) {
-		return ItemStackUtils.createCustomHead(headUrl, name, lore);
+		return  new MenuIcon.Builder(ItemStackUtils.createCustomHead(headUrl))
+				.withName(name)
+				.withLore(lore)
+				.build().createItem();
 	}
 
 	private static ItemStack icon(String headUrl, Message name, Message lore, int customModelData) {
-		ItemStack item = ItemStackUtils.createCustomHead(headUrl, name, lore);
+		ItemStack item = icon(headUrl, name, lore);
 		return ItemStackUtils.setCustomModelData(item, customModelData);
 	}
 }

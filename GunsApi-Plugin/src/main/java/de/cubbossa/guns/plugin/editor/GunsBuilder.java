@@ -9,6 +9,7 @@ import de.cubbossa.guns.plugin.Messages;
 import de.cubbossa.menuframework.inventory.*;
 import de.cubbossa.menuframework.inventory.implementations.AnvilMenu;
 import de.cubbossa.menuframework.inventory.implementations.ListMenu;
+import de.cubbossa.translations.MenuIcon;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -31,13 +32,13 @@ public class GunsBuilder {
 		AtomicReference<ItemStack> gunItem = new AtomicReference<>(new ItemStack(Material.AIR));
 		List<Attachment> activeAttachments = new ArrayList<>();
 
-		ListMenu menu = new ListMenu(Messages.G_GUNS_TITLE.asComponent(languageOwner), 4);
+		ListMenu menu = new ListMenu(Messages.G_GUNS_TITLE, 4);
 		menu.addPreset(GunsEditor.bottomRow(3));
 		menu.addPreset(presetApplier -> {
 			presetApplier.addItemOnTop(3 * 9 + 4, ItemStackUtils.createInfoItem(Messages.G_GUNS_INFO_NAME, Messages.G_GUNS_INFO_LORE));
 		});
 		for (Gun gun : GunsHandler.getInstance().getGunsRegistry()) {
-			if (!gun.getUsePredicate().test(languageOwner)) {
+			if (languageOwner != null && !gun.getUsePredicate().test(languageOwner)) {
 				continue;
 			}
 			menu.addListEntry(Button.builder()
@@ -63,16 +64,16 @@ public class GunsBuilder {
 		}
 		menu.addPreset(presetApplier -> {
 			if (selection.get() != null) {
-				presetApplier.addItemOnTop(3 * 9 + 6, ItemStackUtils.createItemStack(ItemStackUtils.MATERIAL_ATTACH, Messages.G_GUNS_ATTACH_NAME, Messages.G_GUNS_ATTACH_LORE));
+				presetApplier.addItemOnTop(3 * 9 + 6, new MenuIcon(ItemStackUtils.MATERIAL_ATTACH, Messages.G_GUNS_ATTACH_NAME, Messages.G_GUNS_ATTACH_LORE).createItem());
 				presetApplier.addClickHandlerOnTop(3 * 9 + 6, Action.LEFT, clickContext -> {
 					if (clickContext.getMenu() instanceof TopInventoryMenu topMenu) {
-						topMenu.openSubMenu(clickContext.getPlayer(), createAttachmentMenu(selection.get(), gunItem.get(), clickContext.getPlayer(), activeAttachments));
+						topMenu.openSubMenu(clickContext.getPlayer(), createAttachmentMenu(selection.get(), gunItem.get(), activeAttachments));
 					}
 				});
-				presetApplier.addItemOnTop(3 * 9 + 7, ItemStackUtils.createItemStack(ItemStackUtils.MATERIAL_AMMO, Messages.G_GUNS_AMMO_NAME, Messages.G_GUNS_AMMO_LORE));
+				presetApplier.addItemOnTop(3 * 9 + 7, new MenuIcon(ItemStackUtils.MATERIAL_AMMO, Messages.G_GUNS_AMMO_NAME, Messages.G_GUNS_AMMO_LORE).createItem());
 				presetApplier.addClickHandlerOnTop(3 * 9 + 7, Action.LEFT, clickContext -> {
 					if (clickContext.getMenu() instanceof TopInventoryMenu topMenu) {
-						topMenu.openSubMenu(clickContext.getPlayer(), createAmmoMenu(gunItem.get(), clickContext.getPlayer()));
+						topMenu.openSubMenu(clickContext.getPlayer(), createAmmoMenu(gunItem.get()));
 					}
 				});
 			} else {
@@ -87,14 +88,14 @@ public class GunsBuilder {
 		return menu;
 	}
 
-	public static TopMenu createAttachmentMenu(ItemStack gunStack, Player owner) {
+	public static TopMenu createAttachmentMenu(ItemStack gunStack) {
 		Gun gun = GunsHandler.getInstance().getGun(gunStack);
 		List<Attachment> attachments = GunsHandler.getInstance().getAttachments(gunStack);
 
-		return createAttachmentMenu(gun, gunStack, owner, attachments);
+		return createAttachmentMenu(gun, gunStack, attachments);
 	}
 
-	public static TopMenu createAttachmentMenu(Gun gun, ItemStack gunStack, Player owner, List<Attachment> activeAttachments) {
+	public static TopMenu createAttachmentMenu(Gun gun, ItemStack gunStack, List<Attachment> activeAttachments) {
 		ListEditorMenu<Attachment> menu = new ListEditorMenu<>(Messages.G_ATTACH_TITLE, 4, new ListMenuSupplier<>() {
 			@Override
 			public Collection<Attachment> getElements() {
@@ -123,7 +124,7 @@ public class GunsBuilder {
 		return menu;
 	}
 
-	public static TopMenu createAmmoMenu(ItemStack gunStack, Player owner) {
+	public static TopMenu createAmmoMenu(ItemStack gunStack) {
 		Gun gun = GunsHandler.getInstance().getGun(gunStack);
 		if (gun == null) {
 			throw new IllegalArgumentException("Provided ItemStack cannot be resolved to a valid gun type.");
@@ -152,13 +153,16 @@ public class GunsBuilder {
 
 		menu.addPreset(MenuPresets.back(3 * 9 + 8, Action.LEFT));
 		menu.addPreset(presetApplier -> {
-			presetApplier.addItemOnTop(3 * 9 + 5, ItemStackUtils.createItemStack(new ItemStack(Material.PAPER, ammunitionCount.get()),
-					Messages.G_AMMO_COUNT_NAME.asComponent(owner),
-					Messages.G_AMMO_COUNT_LORE.asComponents(owner, TagResolver.builder()
-							.tag("amount", Tag.inserting(Component.text(ammunitionCount.get()))).build())));
+			presetApplier.addItemOnTop(3 * 9 + 5, new MenuIcon.Builder(new ItemStack(Material.PAPER, ammunitionCount.get()))
+					.withName(Messages.G_AMMO_COUNT_NAME)
+					.withLore(Messages.G_AMMO_COUNT_LORE)
+					.withLoreResolver(TagResolver.builder()
+							.tag("amount", Tag.inserting(Component.text(ammunitionCount.get()))).build())
+					.build()
+					.createItem());
 			presetApplier.addClickHandlerOnTop(3 * 9 + 5, Action.LEFT, clickContext -> {
 
-				AnvilMenu m = GunsEditor.newAnvilMenu(Messages.G_AMMO_COUNT_TITLE.asComponent(owner), ammunitionCount.get() + "", AnvilInputValidator.VALIDATE_INT);
+				AnvilMenu m = GunsEditor.newAnvilMenu(Messages.G_AMMO_COUNT_TITLE, ammunitionCount.get() + "", AnvilInputValidator.VALIDATE_INT);
 				m.setOutputClickHandler(AnvilMenu.CONFIRM, s -> {
 					ammunitionCount.set(Integer.parseInt(s.getTarget()));
 					if (s.getMenu() instanceof TopMenu topMenu) {
